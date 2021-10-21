@@ -14,6 +14,11 @@ resource "aws_cognito_user_pool" "users" {
   name = "${var.project_name}-users"
 }
 
+resource "aws_cognito_user_pool_domain" "domain" {
+  domain       = "leoneexpensesystem"
+  user_pool_id = aws_cognito_user_pool.users.id
+}
+
 resource "aws_cognito_identity_provider" "google" {
   user_pool_id  = aws_cognito_user_pool.users.id
   provider_name = "Google"
@@ -41,6 +46,7 @@ resource "aws_cognito_user_pool_client" "client" {
   allowed_oauth_scopes                 = ["email", "openid", "profile"]
   callback_urls                        = ["https://example.com/callback"]
   generate_secret                      = true
+  prevent_user_existence_errors        = "ENABLED"
 
   depends_on = [
     aws_cognito_identity_provider.google
