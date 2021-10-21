@@ -27,8 +27,8 @@ resource "aws_cognito_identity_provider" "google" {
     authorize_url                 = "https://accounts.google.com/o/oauth2/v2/auth"
     attributes_url                = "https://people.googleapis.com/v1/people/me?personFields="
     attributes_url_add_attributes = "true"
-    client_id                     = "${vars.google_oauth_client_id}"
-    client_secret                 = "${vars.google_oauth_client_secret}"
+    client_id                     = "${var.google_oauth_client_id}"
+    client_secret                 = "${var.google_oauth_client_secret}"
   }
 }
 
