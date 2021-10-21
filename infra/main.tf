@@ -35,6 +35,11 @@ resource "aws_cognito_identity_provider" "google" {
     client_id                     = "${var.google_oauth_client_id}"
     client_secret                 = "${var.google_oauth_client_secret}"
   }
+
+  attribute_mapping = {
+    email    = "email"
+    username = "sub"
+  }
 }
 
 resource "aws_cognito_user_pool_client" "client" {
