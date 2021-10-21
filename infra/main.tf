@@ -41,4 +41,8 @@ resource "aws_cognito_user_pool_client" "client" {
   allowed_oauth_scopes                 = ["email", "openid", "profile"]
   callback_urls                        = ["https://example.com/callback"]
   generate_secret                      = true
+
+  depends_on = [
+    aws_cognito_identity_provider.google
+  ]
 }
