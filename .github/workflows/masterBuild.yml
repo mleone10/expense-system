@@ -17,7 +17,7 @@ jobs:
         with:
           node-version: 12
       - name: install node packages
-        working-directory: frontend
+        working-directory: client
         run: npm install
       - name: build client
         working-directory: client
