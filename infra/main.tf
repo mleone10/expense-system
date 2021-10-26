@@ -10,10 +10,6 @@ provider "aws" {
   region = "us-east-1"
 }
 
-provider "google" {
-  project = "expense-system-329705"
-}
-
 resource "aws_cognito_user_pool" "users" {
   name = "${var.project_name}-users"
 }
@@ -92,16 +88,28 @@ resource "aws_acm_certificate" "client_certificate" {
   validation_method = "DNS"
 }
 
-resource "google_dns_managed_zone" "dns_zone" {
-  name     = "${var.project_name}-zone"
-  dns_name = var.domain_name
+resource "aws_route53_zone" "hosted_zone" {
+  name = var.domain_name
 }
 
-resource "google_dns_record_set" "dns_validation" {
-  managed_zone = google_dns_managed_zone.dns_zone.name
-  name         = tolist(aws_acm_certificate.client_certificate.domain_validation_options)[0].resource_record_name
-  rrdatas      = [tolist(aws_acm_certificate.client_certificate.domain_validation_options)[0].resource_record_value]
-  type         = tolist(aws_acm_certificate.client_certificate.domain_validation_options)[0].resource_record_type
+resource "aws_route53_record" "validation_record" {
+  for_each = {
+    for data_validation_option in aws_acm_certificate.client_certificate.domain_validation_options : data_validation_option.domain_name => {
+      name   = data_validation_option.resource_record_name
+      record = data_validation_option.resource_record_value
+      type   = data_validation_option.resource_record_type
+    }
+  }
+
+  name    = each.value.name
+  records = [each.value.record]
+  type    = each.value.type
+  zone_id = aws_route53_zone.hosted_zone.zone_id
+}
+
+resource "aws_acm_certificate_validation" "cert_validation" {
+  certificate_arn         = aws_acm_certificate.client_certificate.arn
+  validation_record_fqdns = [for record in aws_route53_record.validation_record : record.fqdn]
 }
 
 locals {
@@ -144,6 +152,7 @@ resource "aws_cloudfront_distribution" "cdn" {
   }
 
   viewer_certificate {
-    cloudfront_default_certificate = true
+    acm_certificate_arn = aws_acm_certificate.client_certificate.arn
+    ssl_support_method  = "sni-only"
   }
 }

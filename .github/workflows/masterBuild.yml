@@ -42,12 +42,6 @@ jobs:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: us-east-1
-      - name: configure google credentials
-        uses: google-github-actions/setup-gcloud@master
-        with:
-          project_id: expense-system-329705
-          service_account_key: ${{ secrets.GCP_ACCESS_KEY }}
-          export_default_credentials: true
       - name: set up terraform environment
         run: terraform -chdir=infra init
       - name: deploy infrastructure
