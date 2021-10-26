@@ -99,9 +99,9 @@ resource "google_dns_managed_zone" "dns_zone" {
 
 resource "google_dns_record_set" "dns_validation" {
   managed_zone = google_dns_managed_zone.dns_zone.name
-  name         = aws_acm_certificate.client_certificate.domain_validation_options.resource_record_name
-  rrdatas      = [aws_acm_certificate.client_certificate.domain_validation_options.resource_record_value]
-  type         = aws_acm_certificate.client_certificate.domain_validation_options.resource_record_type
+  name         = tolist(aws_acm_certificate.client_certificate.domain_validation_options)[0].resource_record_name
+  rrdatas      = [tolist(aws_acm_certificate.client_certificate.domain_validation_options)[0].resource_record_value]
+  type         = tolist(aws_acm_certificate.client_certificate.domain_validation_options)[0].resource_record_type
 }
 
 locals {
