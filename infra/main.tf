@@ -19,8 +19,21 @@ resource "aws_cognito_user_pool" "users" {
 }
 
 resource "aws_cognito_user_pool_domain" "domain" {
-  domain       = "leoneexpensesystem"
-  user_pool_id = aws_cognito_user_pool.users.id
+  domain          = "auth.${var.domain_name}"
+  certificate_arn = aws_acm_certificate.client_certificate.arn
+  user_pool_id    = aws_cognito_user_pool.users.id
+}
+
+resource "aws_route53_record" "hosted_zone_record" {
+  name    = aws_cognito_user_pool_domain.domain.domain
+  zone_id = aws_route53_zone.hosted_zone.zone_id
+  type    = "A"
+
+  alias {
+    name                   = aws_cognito_user_pool_domain.domain.cloudfront_distribution_arn
+    zone_id                = "Z2FDTNDATAQYW2" # This is the global CloudFront Distribution zone ID
+    evaluate_target_health = false
+  }
 }
 
 resource "aws_cognito_identity_provider" "google" {
