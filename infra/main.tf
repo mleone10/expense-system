@@ -115,11 +115,12 @@ resource "aws_route53_record" "validation_record" {
     }
   }
 
-  name    = each.value.name
-  records = [each.value.record]
-  type    = each.value.type
-  zone_id = aws_route53_zone.hosted_zone.zone_id
-  ttl     = 60
+  name            = each.value.name
+  records         = [each.value.record]
+  type            = each.value.type
+  zone_id         = aws_route53_zone.hosted_zone.zone_id
+  ttl             = 60
+  allow_overwrite = true
 }
 
 resource "aws_acm_certificate_validation" "cert_validation" {
