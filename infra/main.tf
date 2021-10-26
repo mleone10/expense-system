@@ -1,3 +1,4 @@
+# Terraform backend configuration
 terraform {
   backend "s3" {
     bucket = "leone-terraform-states"
@@ -6,10 +7,13 @@ terraform {
   }
 }
 
+# AWS Provider configuration
 provider "aws" {
   region = "us-east-1"
 }
 
+# AWS Cognito infrastructure
+# Allows for simple authentication through third-party identity provider (Google)
 resource "aws_cognito_user_pool" "users" {
   name = "${var.project_name}-users"
 }
@@ -58,6 +62,11 @@ resource "aws_cognito_user_pool_client" "client" {
   ]
 }
 
+# Static site infrastructure
+# A few things happening here:
+# * Create an S3 bucket that can only be accessed by CloudFront
+# * Create an ACM certificate that uses DNS validation against a new Route53 hosted zone
+# * Create a CloudFront distribution that can be accessed via our chosen domain
 resource "aws_s3_bucket" "bucket" {
   bucket = "leone-${var.project_name}"
   acl    = "private"
@@ -122,6 +131,7 @@ resource "aws_cloudfront_distribution" "cdn" {
   is_ipv6_enabled     = true
   default_root_object = "index.html"
   price_class         = "PriceClass_100"
+  aliases             = [var.domain_name]
 
   origin {
     domain_name = aws_s3_bucket.bucket.bucket_regional_domain_name
