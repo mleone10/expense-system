@@ -32,8 +32,8 @@ resource "aws_cognito_identity_provider" "google" {
     authorize_url                 = "https://accounts.google.com/o/oauth2/v2/auth"
     attributes_url                = "https://people.googleapis.com/v1/people/me?personFields="
     attributes_url_add_attributes = "true"
-    client_id                     = "${var.google_oauth_client_id}"
-    client_secret                 = "${var.google_oauth_client_secret}"
+    client_id                     = var.google_oauth_client_id
+    client_secret                 = var.google_oauth_client_secret
   }
 
   attribute_mapping = {
@@ -63,6 +63,26 @@ resource "aws_s3_bucket" "bucket" {
   acl    = "private"
 }
 
+resource "aws_s3_bucket_policy" "bucket_policy" {
+  bucket = aws_s3_bucket.bucket.id
+  policy = data.aws_iam_policy_document.s3_iam_policy.json
+}
+
+data "aws_iam_policy_document" "s3_iam_policy" {
+  statement {
+    actions   = ["s3:GetObject"]
+    resources = ["${aws_s3_bucket.bucket.arn}/*"]
+
+    principals {
+      type        = "AWS"
+      identifiers = [aws_cloudfront_origin_access_identity.origin_access_identity.iam_arn]
+    }
+  }
+}
+
+resource "aws_cloudfront_origin_access_identity" "origin_access_identity" {
+}
+
 locals {
   s3_origin_id = "${var.project_name}-origin"
 }
@@ -76,6 +96,10 @@ resource "aws_cloudfront_distribution" "cdn" {
   origin {
     domain_name = aws_s3_bucket.bucket.bucket_regional_domain_name
     origin_id   = local.s3_origin_id
+
+    s3_origin_config {
+      origin_access_identity = aws_cloudfront_origin_access_identity.origin_access_identity.origin_access_identity.cloudfront_access_identity_path
+    }
   }
 
   default_cache_behavior {
