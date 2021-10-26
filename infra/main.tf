@@ -10,6 +10,10 @@ provider "aws" {
   region = "us-east-1"
 }
 
+provider "google" {
+  project = "expense-system-329705"
+}
+
 resource "aws_cognito_user_pool" "users" {
   name = "${var.project_name}-users"
 }
@@ -63,9 +67,7 @@ resource "aws_s3_bucket" "bucket" {
   acl    = "private"
 }
 
-resource "aws_s3_bucket_policy" "bucket_policy" {
-  bucket = aws_s3_bucket.bucket.id
-  policy = data.aws_iam_policy_document.s3_iam_policy.json
+resource "aws_cloudfront_origin_access_identity" "origin_access_identity" {
 }
 
 data "aws_iam_policy_document" "s3_iam_policy" {
@@ -80,7 +82,26 @@ data "aws_iam_policy_document" "s3_iam_policy" {
   }
 }
 
-resource "aws_cloudfront_origin_access_identity" "origin_access_identity" {
+resource "aws_s3_bucket_policy" "bucket_policy" {
+  bucket = aws_s3_bucket.bucket.id
+  policy = data.aws_iam_policy_document.s3_iam_policy.json
+}
+
+resource "aws_acm_certificate" "client_certificate" {
+  domain_name       = var.domain_name
+  validation_method = "DNS"
+}
+
+resource "google_dns_managed_zone" "dns_zone" {
+  name     = "${var.project_name}-zone"
+  dns_name = var.domain_name
+}
+
+resource "google_dns_record_set" "dns_validation" {
+  managed_zone = google_dns_managed_zone.dns_zone.name
+  name         = aws_acm_certificate.client_certificate.domain_validation_options.resource_record_name
+  rrdatas      = [aws_acm_certificate.client_certificate.domain_validation_options.resource_record_value]
+  type         = aws_acm_certificate.client_certificate.domain_validation_options.resource_record_type
 }
 
 locals {
