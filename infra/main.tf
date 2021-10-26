@@ -93,8 +93,13 @@ resource "aws_s3_bucket_policy" "bucket_policy" {
 }
 
 resource "aws_acm_certificate" "client_certificate" {
-  domain_name       = var.domain_name
-  validation_method = "DNS"
+  domain_name               = var.domain_name
+  validation_method         = "DNS"
+  subject_alternative_names = ["*.${var.domain_name}"]
+
+  lifecycle {
+    create_before_destroy = true
+  }
 }
 
 resource "aws_route53_zone" "hosted_zone" {
