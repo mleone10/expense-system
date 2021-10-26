@@ -43,3 +43,5 @@ jobs:
         run: terraform -chdir=infra init
       - name: deploy infrastructure
         run: terraform -chdir=infra apply -auto-approve -var google_oauth_client_id=${{ secrets.GOOGLE_OAUTH_CLIENT_ID }} -var google_oauth_client_secret=${{ secrets.GOOGLE_OAUTH_CLIENT_SECRET }}
+      - name: deploy client
+        run: aws s3 sync ./client/build s3://$(terraform -chdir=infra output -raw s3_bucket_name)

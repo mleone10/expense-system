@@ -57,3 +57,7 @@ resource "aws_cognito_user_pool_client" "client" {
     aws_cognito_identity_provider.google
   ]
 }
+
+resource "aws_s3_bucket" "bucket" {
+  bucket = "leone-${var.project_name}"
+}
