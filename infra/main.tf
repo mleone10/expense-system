@@ -87,7 +87,7 @@ resource "aws_cloudfront_distribution" "cdn" {
     forwarded_values {
       query_string = false
       cookies {
-        forward = false
+        forward = "none"
       }
     }
   }
