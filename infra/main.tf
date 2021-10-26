@@ -105,6 +105,7 @@ resource "aws_route53_record" "validation_record" {
   records = [each.value.record]
   type    = each.value.type
   zone_id = aws_route53_zone.hosted_zone.zone_id
+  ttl     = 60
 }
 
 resource "aws_acm_certificate_validation" "cert_validation" {
