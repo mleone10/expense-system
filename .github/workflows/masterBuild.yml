@@ -7,7 +7,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  buildClient:
+  build:
     runs-on: ubuntu-latest
     steps:
       - name: checkout code
@@ -17,6 +17,7 @@ jobs:
         with:
           node-version: 12
           cache: npm
+          cache-dependency-path: client/package-lock.json
       - name: install node packages
         working-directory: client
         run: npm install
