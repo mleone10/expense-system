@@ -43,7 +43,7 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: us-east-1
       - name: configure google credentials
-        uses: google-github-actions/setup-gcloud@main
+        uses: google-github-actions/setup-gcloud@master
         with:
           project_id: expense-system-329705
           service_account_key: ${{ secrets.GCP_ACCESS_KEY }}
