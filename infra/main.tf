@@ -64,7 +64,7 @@ resource "aws_s3_bucket" "bucket" {
 }
 
 locals {
-  s3_origin_id = "${vars.project_name}-origin"
+  s3_origin_id = "${var.project_name}-origin"
 }
 
 resource "aws_cloudfront_distribution" "cdn" {
