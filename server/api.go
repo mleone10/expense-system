@@ -26,5 +26,6 @@ func (s Server) handleToken() http.HandlerFunc {
 			Name:  "token",
 			Value: "tokenValue",
 		})
+		w.WriteHeader(http.StatusNoContent)
 	}
 }
