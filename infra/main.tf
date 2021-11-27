@@ -201,7 +201,7 @@ resource "aws_route53_record" "cdn_record" {
 
 # AWS Lambda infrastructure
 resource "aws_iam_role" "lambda_role" {
-  name = "${var.project-name}-execution-role"
+  name = "${var.project_name}-execution-role"
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
     Statement = [
@@ -218,7 +218,7 @@ resource "aws_iam_role" "lambda_role" {
 }
 
 resource "aws_lambda_function" "lambda" {
-  function_name = "${var.project-name}-api"
+  function_name = "${var.project_name}-api"
   role          = aws_iam_role.lambda_role.arn
   filename      = "handler.zip"
   handler       = "bin/lambdaserver"
