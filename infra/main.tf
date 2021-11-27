@@ -142,7 +142,8 @@ resource "aws_acm_certificate_validation" "cert_validation" {
 }
 
 locals {
-  s3_origin_id = "${var.project_name}-origin"
+  s3_origin_id  = "${var.project_name}-origin"
+  api_origin_id = "${var.project_name}-api-origin"
 }
 
 resource "aws_cloudfront_distribution" "cdn" {
@@ -159,6 +160,38 @@ resource "aws_cloudfront_distribution" "cdn" {
     s3_origin_config {
       origin_access_identity = aws_cloudfront_origin_access_identity.origin_access_identity.cloudfront_access_identity_path
     }
+  }
+
+  origin {
+    domain_name = aws_apigatewayv2_api.api.api_endpoint
+    origin_id   = local.api_origin_id
+
+    custom_origin_config {
+      http_port              = 80
+      https_port             = 443
+      origin_protocol_policy = "https-only"
+      origin_ssl_protocols   = ["TLSv1.2"]
+    }
+  }
+
+  ordered_cache_behavior {
+    path_pattern     = "/api/*"
+    allowed_methods  = ["DELETE", "GET", "HEAD", "OPTIONS", "PATCH", "POST", "PUT"]
+    cached_methods   = []
+    target_origin_id = local.api_origin_id
+
+    default_ttl = 0
+    min_ttl     = 0
+    max_ttl     = 0
+
+    forwarded_values {
+      query_string = true
+      cookies {
+        forward = "all"
+      }
+    }
+
+    viewer_protocol_policy = "redirect-to-https"
   }
 
   default_cache_behavior {
