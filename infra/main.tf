@@ -220,7 +220,7 @@ resource "aws_iam_role" "lambda_role" {
 resource "aws_lambda_function" "lambda" {
   function_name = "${var.project_name}-api"
   role          = aws_iam_role.lambda_role.arn
-  filename      = "server/handler.zip"
+  filename      = "../server/handler.zip"
   handler       = "bin/lambdaserver"
   runtime       = "go1.x"
 }
