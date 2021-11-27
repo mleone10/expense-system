@@ -227,11 +227,12 @@ resource "aws_iam_role_policy_attachment" "basic_execution_attachment" {
 }
 
 resource "aws_lambda_function" "lambda" {
-  function_name = "${var.project_name}-api"
-  role          = aws_iam_role.lambda_role.arn
-  filename      = "../server/handler.zip"
-  handler       = "bin/lambdaserver"
-  runtime       = "go1.x"
+  function_name    = "${var.project_name}-api"
+  role             = aws_iam_role.lambda_role.arn
+  filename         = "../server/handler.zip"
+  handler          = "bin/lambdaserver"
+  runtime          = "go1.x"
+  source_code_hash = filebase64sha256("../server/handler.zip")
 }
 
 resource "aws_apigatewayv2_api" "api" {
