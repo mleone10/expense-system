@@ -40,3 +40,21 @@ body {
   border-radius: 5px;
   text-decoration: none;
 }
+
+@media only screen and (max-device-width: 667px) {
+  #root {
+    width: 90%;
+  }
+
+  .app {
+    min-width: unset;
+  }
+
+  .header {
+    flex-direction: column;
+  }
+
+  .header-block {
+    text-align: center;
+  }
+}
