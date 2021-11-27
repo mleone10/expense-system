@@ -1,6 +1,7 @@
 package api
 
 import (
+	"log"
 	"net/http"
 )
 
@@ -15,6 +16,7 @@ func NewServer() (Server, error) {
 }
 
 func (s Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	log.Println("Handling request for", r.Method, r.RequestURI)
 	s.mux.ServeHTTP(w, r)
 }
 

@@ -217,6 +217,15 @@ resource "aws_iam_role" "lambda_role" {
   })
 }
 
+data "aws_iam_policy" "basic_execution_policy" {
+  arn = "arn:aws:iam::aws:policy/AWSLambdaBasicExecutionRole"
+}
+
+resource "aws_iam_role_policy_attachment" "basic_execution_attachment" {
+  role       = aws_iam_role.lambda_role
+  policy_arn = data.aws_iam_policy.basic_execution_policy.arn
+}
+
 resource "aws_lambda_function" "lambda" {
   function_name = "${var.project_name}-api"
   role          = aws_iam_role.lambda_role.arn
