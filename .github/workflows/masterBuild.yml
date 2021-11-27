@@ -24,14 +24,15 @@ jobs:
       - name: build client
         working-directory: client
         run: npm run build
-      # - name: install go
-      #   uses: actions/setup-go@v1
-      #   with:
-      #     go-version: 1.17.x
-      # - name: build lambda artifact
-      #   run: |
-      #     make build
-      #     zip handler.zip ./bin/expense-system
+      - name: install go
+        uses: actions/setup-go@v1
+        with:
+          go-version: 1.17.x
+      - name: build lambda artifact
+        working-directory: server
+        run: |
+          make build
+          zip handler.zip ./bin/lambdaserver
       - name: set up terraform
         uses: hashicorp/setup-terraform@v1
         with:
