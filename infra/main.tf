@@ -163,7 +163,7 @@ resource "aws_cloudfront_distribution" "cdn" {
   }
 
   origin {
-    domain_name = aws_apigatewayv2_api.api.api_endpoint
+    domain_name = replace(aws_apigatewayv2_api.api.api_endpoint, "/^https?://([^/]*).*/", "$1")
     origin_id   = local.api_origin_id
 
     custom_origin_config {
