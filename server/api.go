@@ -11,7 +11,7 @@ type Server struct {
 
 func NewServer() (Server, error) {
 	s := Server{}
-	s.mux.Handle("/token", s.handleToken())
+	s.mux.Handle("/api/token", s.handleToken())
 	return s, nil
 }
 
