@@ -1,6 +1,7 @@
 package api
 
 import (
+	"encoding/json"
 	"log"
 	"net/http"
 )
@@ -21,11 +22,15 @@ func (s Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s Server) handleToken() http.HandlerFunc {
+	type response struct {
+		Token string `json:"token"`
+	}
 	return func(w http.ResponseWriter, r *http.Request) {
-		http.SetCookie(w, &http.Cookie{
-			Name:  "token",
-			Value: "tokenValue",
-		})
-		w.WriteHeader(http.StatusNoContent)
+		res, err := json.Marshal(response{Token: "tokenValue"})
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+		w.Write(res)
 	}
 }
