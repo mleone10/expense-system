@@ -46,7 +46,7 @@ function AppHeader() {
 
 function SignInButton() {
   return (
-    <a href="https://auth.expense.mleone.dev/login?client_id=6ka3m790cv5hrhjdqt2ju89v45&response_type=code&scope=email+openid+profile&redirect_uri=https://expense.mleone.dev" className="header-button">
+    <a href="https://auth.expense.mleone.dev/login?client_id=6ka3m790cv5hrhjdqt2ju89v45&response_type=code&scope=email+openid+profile&redirect_uri=https://expense.mleone.dev/auth/callback" className="header-button">
       Sign In
     </a>
   )
