@@ -1,4 +1,4 @@
-import { Routes, Route, Outlet, Navigate } from 'react-router';
+import { Routes, Route, Navigate } from 'react-router';
 import { AuthProvider, useAuth } from './AuthContext';
 
 import './App.css';
@@ -47,7 +47,7 @@ function AppFooter() {
   return (
     <div className="app-footer">
       <p>Copyright &copy; 2021 Mario Leone</p>
-      <p>Money icon by <a target="_blank" href="https://icons8.com">Icons8</a></p>
+      <p>Money icon by <a href="https://icons8.com">Icons8</a></p>
     </div>
   )
 }
