@@ -64,10 +64,6 @@ function AuthCallback() {
   let auth = useAuth();
 
   useEffect(() => {
-    if (auth.token) {
-      return;
-    }
-
     let code = new URLSearchParams(window.location.search).get("code");
     fetch(`/api/token?code=${code}`)
       .then(res => res.json())
@@ -79,7 +75,7 @@ function AuthCallback() {
           console.log(`Failed to exchange authorization code: ${error}`)
         }
       )
-  })
+  }, [auth])
 
   if (auth.token) {
     return <Navigate to="/" />
@@ -88,6 +84,14 @@ function AuthCallback() {
   return (
     <div>
       Loading...
+    </div>
+  )
+}
+
+function Footer() {
+  return (
+    <div>
+      <a target="_blank" href="https://icons8.comundefined">Money</a> icon by <a target="_blank" href="https://icons8.com">Icons8</a>
     </div>
   )
 }
