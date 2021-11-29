@@ -8,24 +8,12 @@ function App() {
   return (
     <div className="app">
       <AuthProvider>
-        <Routes>
-          <Route element={<AppLayout />}>
-            <Route path="/" element={<AuthenticatedApp />} />
-            <Route path="/auth/callback" element={<AuthCallback />} />
-          </Route>
-        </Routes>
+        <AppHeader />
+        <AppContent />
+        <AppFooter />
       </AuthProvider>
     </div>
   );
-}
-
-function AppLayout() {
-  return (
-    <div>
-      <AppHeader />
-      <Outlet />
-    </div>
-  )
 }
 
 function AppHeader() {
@@ -41,6 +29,26 @@ function AppHeader() {
         <SignInButton />
       </div>
     </header>
+  )
+}
+
+function AppContent() {
+  return (
+    <div className="app-content">
+      <Routes>
+        <Route path="/" element={<AuthenticatedApp />} />
+        <Route path="/auth/callback" element={<AuthCallback />} />
+      </Routes>
+    </div>
+  )
+}
+
+function AppFooter() {
+  return (
+    <div className="app-footer">
+      <p>Copyright &copy; 2021 Mario Leone</p>
+      <p>Money icon by <a target="_blank" href="https://icons8.com">Icons8</a></p>
+    </div>
   )
 }
 
@@ -84,14 +92,6 @@ function AuthCallback() {
   return (
     <div>
       Loading...
-    </div>
-  )
-}
-
-function Footer() {
-  return (
-    <div>
-      <a target="_blank" href="https://icons8.comundefined">Money</a> icon by <a target="_blank" href="https://icons8.com">Icons8</a>
     </div>
   )
 }
