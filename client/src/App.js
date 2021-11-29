@@ -45,16 +45,17 @@ function AppContent() {
 
 function AppFooter() {
   return (
-    <div className="app-footer">
+    <footer className="app-footer">
       <p>Copyright &copy; 2021 <a href="https://twitter.com/mleone5244">Mario Leone</a></p>
       <p>Money icon by <a href="https://icons8.com">Icons8</a></p>
-    </div>
+    </footer>
   )
 }
 
 function SignInButton() {
+  const signInLink = `https://auth.expense.mleone.dev/login?client_id=6ka3m790cv5hrhjdqt2ju89v45&response_type=code&scope=email+openid+profile&redirect_uri=${process.env.NODE_ENV == "development" ? 'http://localhost:3000' : 'https://auth.expense.mleone.dev'}/ auth / callback`
   return (
-    <a href="https://auth.expense.mleone.dev/login?client_id=6ka3m790cv5hrhjdqt2ju89v45&response_type=code&scope=email+openid+profile&redirect_uri=https://expense.mleone.dev/auth/callback" className="header-button">
+    <a href={signInLink} className="header-button" >
       Sign In
     </a>
   )
@@ -77,7 +78,7 @@ function AuthCallback() {
       .then(res => res.json())
       .then(
         (result) => {
-          auth.signin(result.token);
+          auth.signIn(result.token);
         },
         (error) => {
           console.log(`Failed to exchange authorization code: ${error}`)
@@ -85,7 +86,7 @@ function AuthCallback() {
       )
   }, [auth])
 
-  if (auth.token) {
+  if (auth.isSignedIn()) {
     return <Navigate to="/" />
   }
 
