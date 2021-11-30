@@ -26,7 +26,7 @@ function AppHeader() {
         </p>
       </div>
       <div className="header-block">
-        <SignInButton />
+        {useAuth().isSignedIn() ? <SignOutButton /> : <SignInButton />}
       </div>
     </header>
   )
@@ -36,7 +36,7 @@ function AppContent() {
   return (
     <div className="app-content">
       <Routes>
-        <Route path="/" element={<AuthenticatedApp />} />
+        <Route path="/" element={useAuth().isSignedIn() ? <AuthenticatedApp /> : <UnauthenticatedApp />} />
         <Route path="/auth/callback" element={<AuthCallback />} />
       </Routes>
     </div>
@@ -55,36 +55,55 @@ function AppFooter() {
 function SignInButton() {
   const signInLink = `https://auth.expense.mleone.dev/login?client_id=6ka3m790cv5hrhjdqt2ju89v45&response_type=code&scope=email+openid+profile&redirect_uri=${process.env.NODE_ENV === "development" ? 'http://localhost:3000' : 'https://expense.mleone.dev'}/auth/callback`
   return (
-    <a href={signInLink} className="header-button" >
-      Sign In
+    <a href={signInLink}>
+      <button className="header-button">
+        Sign In
+      </button>
     </a>
+  )
+}
+
+function SignOutButton() {
+  return (
+    <button className="header-button" onClick={useAuth().signOut}>
+      Sign Out
+    </button>
   )
 }
 
 function AuthenticatedApp() {
   return (
     <div>
-      Welcome
+      Welcome known user!
+    </div>
+  )
+}
+
+function UnauthenticatedApp() {
+  return (
+    <div>
+      Welcome stranger!
     </div>
   )
 }
 
 function AuthCallback() {
-  let auth = useAuth();
+  const auth = useAuth();
+  const signIn = auth.signIn;
+  const code = new URLSearchParams(window.location.search).get("code");
 
   useEffect(() => {
-    let code = new URLSearchParams(window.location.search).get("code");
     fetch(`/api/token?code=${code}`)
       .then(res => res.json())
       .then(
         (result) => {
-          auth.signIn(result.token);
+          signIn(result.token);
         },
         (error) => {
           console.log(`Failed to exchange authorization code: ${error}`)
         }
       )
-  }, [auth])
+  }, [code, signIn])
 
   if (auth.isSignedIn()) {
     return <Navigate to="/" />

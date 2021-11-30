@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, ReactNode } from 'react';
+import { createContext, useContext, useState, useCallback, ReactNode } from 'react';
 
 interface AuthContextType {
   isSignedIn: () => boolean;
@@ -11,19 +11,20 @@ const AuthContext = createContext<AuthContextType>(null!);
 function AuthProvider({ children }: { children: ReactNode }) {
   let [token, setToken] = useState<string>("");
 
-  let isSignedIn = () => {
-    console.log("Evaluating token")
-    return token !== "";
-  }
+  let isSignedIn = useCallback(
+    () => {
+      return token !== "";
+    }, [token]);
 
-  let signIn = (token: string) => {
-    setToken(token);
-  }
+  let signIn = useCallback(
+    (token: string) => {
+      setToken(token);
+    }, []);
 
-  let signOut = () => {
-    console.log("Signing out user")
-    setToken("");
-  }
+  let signOut = useCallback(
+    () => {
+      setToken("");
+    }, []);
 
   let value = { isSignedIn, signIn, signOut };
 
