@@ -19,3 +19,15 @@ variable "google_oauth_client_secret" {
   sensitive = true
   default   = "fakeSecret"
 }
+
+variable "cognito_client_id" {
+  type      = string
+  sensitive = true
+  default   = "fakeId"
+}
+
+variable "cognito_client_secret" {
+  type      = string
+  sensitive = true
+  default   = "fakeSecret"
+}
