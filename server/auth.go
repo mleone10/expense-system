@@ -48,7 +48,7 @@ func (a *authClient) GetAuthTokens(authCode string) (authTokens, error) {
 	data := url.Values{}
 	data.Add("grant_type", "authorization_code")
 	data.Add("client_id", a.cognitoClientId)
-	data.Add("redirect_uri", "")
+	data.Add("redirect_uri", a.redirectUri)
 	data.Add("code", authCode)
 
 	req, err := http.NewRequest("POST", "https://auth.expense.mleone.dev/oauth2/token", strings.NewReader(data.Encode()))

@@ -99,6 +99,7 @@ function AuthCallback() {
           signIn();
         },
         (error) => {
+          // TODO: Fix error handling.  Currently does treats HTTP 500 as success.
           console.log(`Failed to exchange authorization code: ${error}`)
         }
       )

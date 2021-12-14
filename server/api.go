@@ -22,14 +22,13 @@ func NewServer() (Server, error) {
 		auth: authClient,
 	}
 
+	// s.mux.Handle("/api/token", s.logRequests(s.handleToken()))
 	s.mux.Handle("/api/token", s.handleToken())
 
 	return s, nil
 }
 
 func (s Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	// TODO: Extract request logging to a middleware.
-	log.Println("Handling request for", r.Method, r.RequestURI)
 	s.mux.ServeHTTP(w, r)
 }
 
@@ -53,5 +52,13 @@ func (s Server) handleToken() http.HandlerFunc {
 			HttpOnly: true,
 			Expires:  time.Now().Add(time.Hour * 168),
 		})
+	}
+}
+
+func (s Server) logRequests(next http.HandlerFunc) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		// TODO: Log request duration, request ID.
+		log.Println("Handling request for", r.Method, r.RequestURI)
+		next.ServeHTTP(w, r)
 	}
 }
