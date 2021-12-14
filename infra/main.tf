@@ -272,6 +272,16 @@ resource "aws_lambda_function" "lambda" {
   handler          = "bin/lambdaserver"
   runtime          = "go1.x"
   source_code_hash = filebase64sha256("../server/handler.zip")
+
+  environment {
+    variables = {
+      # TODO: Store lambda credentials elsewhere.  KMS-encrypted strings?
+      COGNITO_CLIENT_ID     = var.cognito_client_id
+      COGNITO_CLIENT_SECRET = var.cognito_client_secret
+      CLIENT_SCHEME         = "https"
+      CLIENT_HOST           = "expense.mleone.dev"
+    }
+  }
 }
 
 resource "aws_apigatewayv2_api" "api" {

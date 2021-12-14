@@ -26,7 +26,7 @@ function AppHeader() {
         </p>
       </div>
       <div className="header-block">
-        {useAuth().isSignedIn() ? <SignOutButton /> : <SignInButton />}
+        {useAuth().getIsSignedIn() ? <SignOutButton /> : <SignInButton />}
       </div>
     </header>
   )
@@ -36,7 +36,7 @@ function AppContent() {
   return (
     <div className="app-content">
       <Routes>
-        <Route path="/" element={useAuth().isSignedIn() ? <AuthenticatedApp /> : <UnauthenticatedApp />} />
+        <Route path="/" element={useAuth().getIsSignedIn() ? <AuthenticatedApp /> : <UnauthenticatedApp />} />
         <Route path="/auth/callback" element={<AuthCallback />} />
       </Routes>
     </div>
@@ -91,11 +91,12 @@ function AuthCallback() {
   const code = new URLSearchParams(window.location.search).get("code");
 
   useEffect(() => {
-    fetch(`/api/token?code=${code}`)
-      .then(res => res.json())
+    fetch(`/api/token?code=${code}`, {
+      credentials: "include"
+    })
       .then(
-        (result) => {
-          signIn(result.token);
+        () => {
+          signIn();
         },
         (error) => {
           console.log(`Failed to exchange authorization code: ${error}`)
@@ -103,15 +104,11 @@ function AuthCallback() {
       )
   }, [code, signIn])
 
-  if (auth.isSignedIn()) {
+  if (auth.getIsSignedIn()) {
     return <Navigate to="/" />
+  } else {
+    return <div>Something went wrong.  Please try again.</div>
   }
-
-  return (
-    <div>
-      Loading...
-    </div>
-  )
 }
 
 export default App;

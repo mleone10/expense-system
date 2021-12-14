@@ -1,4 +1,6 @@
 .PHONY: build run
+.SILENT:
+-include ./.env
 
 clean:
 	rm -rf bin
@@ -9,4 +11,5 @@ build: clean
 	done
 
 run: build
-	./bin/localserver
+	# TODO: Find a better way to manage local configuration.
+	CLIENT_SCHEME=http CLIENT_HOST=localhost:3000 COGNITO_CLIENT_ID=${COGNITO_CLIENT_ID} COGNITO_CLIENT_SECRET=${COGNITO_CLIENT_SECRET} ./bin/localserver

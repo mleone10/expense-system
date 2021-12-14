@@ -1,32 +1,33 @@
 import { createContext, useContext, useState, useCallback, ReactNode } from 'react';
 
 interface AuthContextType {
-  isSignedIn: () => boolean;
-  signIn: (token: string) => void;
+  getIsSignedIn: () => boolean;
+  signIn: () => void;
   signOut: () => void;
 }
 
 const AuthContext = createContext<AuthContextType>(null!);
 
 function AuthProvider({ children }: { children: ReactNode }) {
-  let [token, setToken] = useState<string>("");
+  let [isSignedIn, setIsSignedIn] = useState<boolean>(false);
 
-  let isSignedIn = useCallback(
+  let getIsSignedIn: () => boolean = useCallback(
     () => {
-      return token !== "";
-    }, [token]);
+      return isSignedIn
+    }, [isSignedIn]
+  )
 
   let signIn = useCallback(
-    (token: string) => {
-      setToken(token);
+    () => {
+      setIsSignedIn(true);
     }, []);
 
   let signOut = useCallback(
     () => {
-      setToken("");
+      setIsSignedIn(false);
     }, []);
 
-  let value = { isSignedIn, signIn, signOut };
+  let value = { getIsSignedIn, signIn, signOut };
 
   return (
     <AuthContext.Provider value={value}>
