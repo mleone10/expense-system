@@ -16,6 +16,8 @@ type Server struct {
 	logger log.Logger
 }
 
+type ErrorHandlerFunc func(w http.ResponseWriter, r *http.Request) error
+
 func NewServer(c Config) (Server, error) {
 	authClient, err := NewAuthClient(c)
 	if err != nil {
@@ -27,7 +29,7 @@ func NewServer(c Config) (Server, error) {
 		logger: *log.New(os.Stderr, "", log.LstdFlags),
 	}
 
-	s.mux.Handle("/api/token", s.logRequests(s.handleToken()))
+	s.mux.Handle("/api/token", s.commonMiddleware(s.handleToken()))
 
 	return s, nil
 }
@@ -36,18 +38,11 @@ func (s Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	s.mux.ServeHTTP(w, r)
 }
 
-func (s Server) handleToken() http.HandlerFunc {
-	type response struct {
-		Token string `json:"token"`
-	}
-
-	return func(w http.ResponseWriter, r *http.Request) {
+func (s Server) handleToken() ErrorHandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) error {
 		ats, err := s.auth.GetAuthTokens(r.URL.Query().Get("code"))
 		if err != nil {
-			// TODO: Create common error logger/response writer.
-			s.logger.Printf("Failed to get auth tokens: %v", err)
-			w.WriteHeader(http.StatusInternalServerError)
-			return
+			return fmt.Errorf("Failed to get auth tokens: %w", err)
 		}
 
 		http.SetCookie(w, &http.Cookie{
@@ -56,7 +51,24 @@ func (s Server) handleToken() http.HandlerFunc {
 			HttpOnly: true,
 			Expires:  time.Now().Add(time.Hour * 168),
 		})
-		w.WriteHeader(http.StatusOK)
+
+		return nil
+	}
+}
+
+func (s Server) commonMiddleware(f ErrorHandlerFunc) http.HandlerFunc {
+	return s.logRequests(s.errorHandler(f))
+}
+
+// TODO: Extend this to handle writing response objects to http.ResponseWriter and set default status code.
+// Might need to extend http.ResponseWriter to support isWritten flag, etc.
+func (s Server) errorHandler(f ErrorHandlerFunc) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		err := f(w, r)
+		if err != nil {
+			s.logger.Printf("Request <> %v", err)
+			w.WriteHeader(http.StatusInternalServerError)
+		}
 	}
 }
 
