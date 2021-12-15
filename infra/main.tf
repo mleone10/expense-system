@@ -66,7 +66,7 @@ resource "aws_cognito_user_pool_client" "client" {
   allowed_oauth_flows_user_pool_client = true
   allowed_oauth_flows                  = ["code"]
   allowed_oauth_scopes                 = ["email", "openid", "profile"]
-  callback_urls                        = ["https://expense.mleone.dev/auth/callback"]
+  callback_urls                        = ["https://expense.mleone.dev/auth/callback", "http://localhost:3000/auth/callback"]
   generate_secret                      = true
   prevent_user_existence_errors        = "ENABLED"
 
@@ -272,6 +272,16 @@ resource "aws_lambda_function" "lambda" {
   handler          = "bin/lambdaserver"
   runtime          = "go1.x"
   source_code_hash = filebase64sha256("../server/handler.zip")
+
+  environment {
+    variables = {
+      # TODO: Store lambda credentials elsewhere.  KMS-encrypted strings?
+      COGNITO_CLIENT_ID     = var.cognito_client_id
+      COGNITO_CLIENT_SECRET = var.cognito_client_secret
+      CLIENT_SCHEME         = "https"
+      CLIENT_HOST           = "expense.mleone.dev"
+    }
+  }
 }
 
 resource "aws_apigatewayv2_api" "api" {
