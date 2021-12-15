@@ -93,16 +93,11 @@ function AuthCallback() {
   useEffect(() => {
     fetch(`/api/token?code=${code}`, {
       credentials: "include"
+    }).then(response => {
+      if (response.ok) {
+        signIn();
+      }
     })
-      .then(
-        () => {
-          signIn();
-        },
-        (error) => {
-          // TODO: Fix error handling.  Currently does treats HTTP 500 as success.
-          console.log(`Failed to exchange authorization code: ${error}`)
-        }
-      )
   }, [code, signIn])
 
   if (auth.getIsSignedIn()) {

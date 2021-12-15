@@ -12,4 +12,4 @@ build: clean
 
 run: build
 	# TODO: Find a better way to manage local configuration.
-	CLIENT_SCHEME=http CLIENT_HOST=localhost:3000 COGNITO_CLIENT_ID=${COGNITO_CLIENT_ID} COGNITO_CLIENT_SECRET=${COGNITO_CLIENT_SECRET} ./bin/localserver
+	CLIENT_SCHEME=http CLIENT_HOST=localhost:3000 COGNITO_CLIENT_ID=6ka3m790cv5hrhjdqt2ju89v45 COGNITO_CLIENT_SECRET=${COGNITO_CLIENT_SECRET} ./bin/localserver

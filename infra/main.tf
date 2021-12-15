@@ -276,7 +276,7 @@ resource "aws_lambda_function" "lambda" {
   environment {
     variables = {
       # TODO: Store lambda credentials elsewhere.  KMS-encrypted strings?
-      COGNITO_CLIENT_ID     = var.cognito_client_id
+      COGNITO_CLIENT_ID     = "6ka3m790cv5hrhjdqt2ju89v45"
       COGNITO_CLIENT_SECRET = var.cognito_client_secret
       CLIENT_SCHEME         = "https"
       CLIENT_HOST           = "expense.mleone.dev"

@@ -50,7 +50,6 @@ jobs:
           terraform -chdir=infra apply -auto-approve \
             -var google_oauth_client_id=${{ secrets.GOOGLE_OAUTH_CLIENT_ID }} \
             -var google_oauth_client_secret=${{ secrets.GOOGLE_OAUTH_CLIENT_SECRET }} \
-            -var cognito_client_id=${{ secrets.COGNITO_CLIENT_ID }} \
             -var cognito_client_secret=${{ secrets.COGNITO_CLIENT_SECRET }}
           echo "S3_BUCKET_NAME=$(terraform -chdir=infra output -raw s3_bucket_name)" >> $GITHUB_ENV
       - name: deploy client
