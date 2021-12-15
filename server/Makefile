@@ -11,5 +11,4 @@ build: clean
 	done
 
 run: build
-	# TODO: Find a better way to manage local configuration.
 	COGNITO_CLIENT_SECRET=${COGNITO_CLIENT_SECRET} ./bin/localserver
