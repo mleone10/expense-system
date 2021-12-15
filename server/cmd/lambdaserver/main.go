@@ -2,6 +2,7 @@ package main
 
 import (
 	"log"
+	"os"
 
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
@@ -10,11 +11,12 @@ import (
 )
 
 func main() {
-	// authr, err := firebase.NewAuthenticator()
-	// if err != nil {
-	// 	log.Panicf("Failed to initialize authenticator: %v", err)
-	// }
-	server, err := api.NewServer()
+	server, err := api.NewServer(api.Config{
+		CognitoClientId:     "6ka3m790cv5hrhjdqt2ju89v45",
+		CognitoClientSecret: os.Getenv("COGNITO_CLIENT_SECRET"),
+		ClientHostname:      "expense.mleone.dev",
+		ClientScheme:        "https",
+	})
 	if err != nil {
 		log.Fatalf("Failed to initialize server: %v", err)
 	}

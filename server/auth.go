@@ -8,7 +8,6 @@ import (
 	"log"
 	"net/http"
 	"net/url"
-	"os"
 	"strings"
 )
 
@@ -25,14 +24,20 @@ type authTokens struct {
 	refreshToken string
 }
 
-func NewAuthClient() (*authClient, error) {
-	cognitoClientId := os.Getenv("COGNITO_CLIENT_ID")
+type authClientConfig interface {
+	getClientHostname() string
+	getClientScheme() string
+	getCognitoClientId() string
+	getCognitoClientSecret() string
+}
+
+func NewAuthClient(c authClientConfig) (*authClient, error) {
 
 	a := authClient{
 		client:          http.Client{},
-		cognitoClientId: cognitoClientId,
-		basicAuth:       fmt.Sprintf("Basic %s", base64.StdEncoding.EncodeToString([]byte(fmt.Sprintf("%s:%s", cognitoClientId, os.Getenv("COGNITO_CLIENT_SECRET"))))),
-		redirectUri:     fmt.Sprintf("%s://%s/auth/callback", os.Getenv("CLIENT_SCHEME"), os.Getenv("CLIENT_HOST")),
+		cognitoClientId: c.getCognitoClientId(),
+		basicAuth:       fmt.Sprintf("Basic %s", base64.StdEncoding.EncodeToString([]byte(fmt.Sprintf("%s:%s", c.getCognitoClientId(), c.getCognitoClientSecret())))),
+		redirectUri:     fmt.Sprintf("%s://%s/auth/callback", c.getClientScheme(), c.getClientHostname()),
 	}
 
 	return &a, nil

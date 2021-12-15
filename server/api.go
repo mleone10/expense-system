@@ -12,8 +12,8 @@ type Server struct {
 	mux  http.ServeMux
 }
 
-func NewServer() (Server, error) {
-	authClient, err := NewAuthClient()
+func NewServer(c Config) (Server, error) {
+	authClient, err := NewAuthClient(c)
 	if err != nil {
 		return Server{}, fmt.Errorf("failed to initialize auth client: %w", err)
 	}
