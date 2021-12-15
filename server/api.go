@@ -4,12 +4,16 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"os"
 	"time"
+
+	"github.com/gofrs/uuid"
 )
 
 type Server struct {
-	auth *authClient
-	mux  http.ServeMux
+	auth   *authClient
+	mux    http.ServeMux
+	logger log.Logger
 }
 
 func NewServer(c Config) (Server, error) {
@@ -19,11 +23,11 @@ func NewServer(c Config) (Server, error) {
 	}
 
 	s := Server{
-		auth: authClient,
+		auth:   authClient,
+		logger: *log.New(os.Stderr, "", log.LstdFlags),
 	}
 
-	// s.mux.Handle("/api/token", s.logRequests(s.handleToken()))
-	s.mux.Handle("/api/token", s.handleToken())
+	s.mux.Handle("/api/token", s.logRequests(s.handleToken()))
 
 	return s, nil
 }
@@ -41,7 +45,7 @@ func (s Server) handleToken() http.HandlerFunc {
 		ats, err := s.auth.GetAuthTokens(r.URL.Query().Get("code"))
 		if err != nil {
 			// TODO: Create common error logger/response writer.
-			log.Printf("Failed to get auth tokens: %v", err)
+			s.logger.Printf("Failed to get auth tokens: %v", err)
 			w.WriteHeader(http.StatusInternalServerError)
 			return
 		}
@@ -57,9 +61,22 @@ func (s Server) handleToken() http.HandlerFunc {
 }
 
 func (s Server) logRequests(next http.HandlerFunc) http.HandlerFunc {
+	startTime := func() time.Time {
+		return time.Now()
+	}
+	logReturn := func(startTime time.Time, requestId string) {
+		s.logger.Printf("Request: %s completed in %s", requestId, time.Since(startTime))
+	}
+
 	return func(w http.ResponseWriter, r *http.Request) {
-		// TODO: Log request duration, request ID.
-		log.Println("Handling request for", r.Method, r.RequestURI)
+		requestUuid, err := uuid.NewV4()
+		if err != nil {
+			s.logger.Println("Failed to generate request ID: %w", err)
+			requestUuid = uuid.FromStringOrNil("")
+		}
+
+		defer logReturn(startTime(), requestUuid.String())
+		s.logger.Printf("Request: %s Method: %s URI: %s", requestUuid.String(), r.Method, r.RequestURI)
 		next.ServeHTTP(w, r)
 	}
 }

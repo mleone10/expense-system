@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"log"
 	"net/http"
 	"net/url"
 	"strings"
@@ -75,7 +74,7 @@ func (a *authClient) GetAuthTokens(authCode string) (authTokens, error) {
 	defer res.Body.Close()
 	bodyBytes, err := io.ReadAll(res.Body)
 	if err != nil {
-		log.Fatal(err)
+		return authTokens{}, fmt.Errorf("failed to read token response body: %w", err)
 	}
 
 	var tokens tokenResponse

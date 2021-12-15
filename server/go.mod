@@ -6,3 +6,5 @@ require (
 	github.com/aws/aws-lambda-go v1.27.0
 	github.com/awslabs/aws-lambda-go-api-proxy v0.11.0
 )
+
+require github.com/gofrs/uuid v4.2.0+incompatible
