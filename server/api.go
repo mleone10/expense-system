@@ -1,6 +1,7 @@
 package api
 
 import (
+	"context"
 	"fmt"
 	"log"
 	"net/http"
@@ -17,6 +18,10 @@ type Server struct {
 }
 
 type ErrorHandlerFunc func(w http.ResponseWriter, r *http.Request) error
+
+type KeyTypeRequestId string
+
+const KeyRequestId KeyTypeRequestId = "requestId"
 
 func NewServer(c Config) (Server, error) {
 	authClient, err := NewAuthClient(c)
@@ -57,7 +62,7 @@ func (s Server) handleToken() ErrorHandlerFunc {
 }
 
 func (s Server) commonMiddleware(f ErrorHandlerFunc) http.HandlerFunc {
-	return s.logRequests(s.errorHandler(f))
+	return s.injectRequestId(s.logRequests(s.errorHandler(f)))
 }
 
 // TODO: Extend this to handle writing response objects to http.ResponseWriter and set default status code.
@@ -66,7 +71,7 @@ func (s Server) errorHandler(f ErrorHandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		err := f(w, r)
 		if err != nil {
-			s.logger.Printf("Request <> %v", err)
+			s.logger.Printf("Request: %s %v", s.getRequestId(r), err)
 			w.WriteHeader(http.StatusInternalServerError)
 		}
 	}
@@ -76,19 +81,38 @@ func (s Server) logRequests(next http.HandlerFunc) http.HandlerFunc {
 	startTime := func() time.Time {
 		return time.Now()
 	}
-	logReturn := func(startTime time.Time, requestId string) {
-		s.logger.Printf("Request: %s completed in %s", requestId, time.Since(startTime))
+	logReturn := func(startTime time.Time, r *http.Request) {
+		s.logger.Printf("Request: %s completed in %s", s.getRequestId(r), time.Since(startTime))
 	}
 
 	return func(w http.ResponseWriter, r *http.Request) {
+		defer logReturn(startTime(), r)
+		s.logger.Printf("Request: %s Method: %s URI: %s", s.getRequestId(r), r.Method, r.RequestURI)
+		next.ServeHTTP(w, r)
+	}
+}
+
+func (s Server) injectRequestId(next http.HandlerFunc) http.HandlerFunc {
+	genRequestId := func() string {
 		requestUuid, err := uuid.NewV4()
 		if err != nil {
 			s.logger.Println("Failed to generate request ID: %w", err)
 			requestUuid = uuid.FromStringOrNil("")
 		}
+		return requestUuid.String()
+	}
 
-		defer logReturn(startTime(), requestUuid.String())
-		s.logger.Printf("Request: %s Method: %s URI: %s", requestUuid.String(), r.Method, r.RequestURI)
-		next.ServeHTTP(w, r)
+	return func(w http.ResponseWriter, r *http.Request) {
+		next.ServeHTTP(w, r.WithContext(context.WithValue(r.Context(), KeyRequestId, genRequestId())))
+	}
+}
+
+func (s Server) getRequestId(r *http.Request) string {
+	requestId := r.Context().Value(KeyRequestId)
+	if id, ok := requestId.(string); ok {
+		return id
+	} else {
+		s.logger.Println("No request ID found")
+		return ""
 	}
 }
