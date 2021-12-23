@@ -8,3 +8,5 @@ require (
 )
 
 require github.com/gofrs/uuid v4.2.0+incompatible
+
+require github.com/go-chi/chi/v5 v5.0.7 // indirect

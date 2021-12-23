@@ -2,22 +2,22 @@ package api
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
 	"os"
 	"time"
 
+	"github.com/go-chi/chi/v5"
 	"github.com/gofrs/uuid"
 )
 
 type Server struct {
 	auth   *authClient
-	mux    http.ServeMux
+	router chi.Router
 	logger log.Logger
 }
-
-type ErrorHandlerFunc func(w http.ResponseWriter, r *http.Request) error
 
 type KeyTypeRequestId string
 
@@ -31,23 +31,46 @@ func NewServer(c Config) (Server, error) {
 
 	s := Server{
 		auth:   authClient,
+		router: chi.NewRouter(),
 		logger: *log.New(os.Stderr, "", log.LstdFlags),
 	}
 
-	s.mux.Handle("/api/token", s.commonMiddleware(s.handleToken()))
+	s.router.Use(s.requestId)
+	s.router.Use(s.logRequests)
+	s.router.Route("/api", func(r chi.Router) {
+		r.Get("/health", s.handleHealth())
+		r.Get("/token", s.handleToken())
+		r.Route("/orgs", handleOrgs())
+		r.Route("/users", func(r chi.Router) {
+			r.Route("/{userID}", func(r chi.Router) {
+			})
+		})
+	})
 
 	return s, nil
 }
 
 func (s Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	s.mux.ServeHTTP(w, r)
+	s.router.ServeHTTP(w, r)
 }
 
-func (s Server) handleToken() ErrorHandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) error {
+func (s Server) handleHealth() http.HandlerFunc {
+	type response struct {
+		Status string `json:"status"`
+	}
+
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		json.NewEncoder(w).Encode(response{
+			Status: "ok",
+		})
+	})
+}
+
+func (s Server) handleToken() http.HandlerFunc {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		ats, err := s.auth.GetAuthTokens(r.URL.Query().Get("code"))
 		if err != nil {
-			return fmt.Errorf("Failed to get auth tokens: %w", err)
+			s.error(w, r, fmt.Errorf("failed to get auth tokens: %w", err))
 		}
 
 		http.SetCookie(w, &http.Cookie{
@@ -56,28 +79,15 @@ func (s Server) handleToken() ErrorHandlerFunc {
 			HttpOnly: true,
 			Expires:  time.Now().Add(time.Hour * 168),
 		})
-
-		return nil
-	}
+	})
 }
 
-func (s Server) commonMiddleware(f ErrorHandlerFunc) http.HandlerFunc {
-	return s.injectRequestId(s.logRequests(s.errorHandler(f)))
+func (s Server) error(w http.ResponseWriter, r *http.Request, err error) {
+	http.Error(w, "internal server error", http.StatusInternalServerError)
+	s.logger.Printf("Request: %s %v", s.getRequestId(r), err)
 }
 
-// TODO: Extend this to handle writing response objects to http.ResponseWriter and set default status code.
-// Might need to extend http.ResponseWriter to support isWritten flag, etc.
-func (s Server) errorHandler(f ErrorHandlerFunc) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		err := f(w, r)
-		if err != nil {
-			s.logger.Printf("Request: %s %v", s.getRequestId(r), err)
-			w.WriteHeader(http.StatusInternalServerError)
-		}
-	}
-}
-
-func (s Server) logRequests(next http.HandlerFunc) http.HandlerFunc {
+func (s Server) logRequests(next http.Handler) http.Handler {
 	startTime := func() time.Time {
 		return time.Now()
 	}
@@ -85,14 +95,14 @@ func (s Server) logRequests(next http.HandlerFunc) http.HandlerFunc {
 		s.logger.Printf("Request: %s completed in %s", s.getRequestId(r), time.Since(startTime))
 	}
 
-	return func(w http.ResponseWriter, r *http.Request) {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		defer logReturn(startTime(), r)
 		s.logger.Printf("Request: %s Method: %s URI: %s", s.getRequestId(r), r.Method, r.RequestURI)
 		next.ServeHTTP(w, r)
-	}
+	})
 }
 
-func (s Server) injectRequestId(next http.HandlerFunc) http.HandlerFunc {
+func (s Server) requestId(next http.Handler) http.Handler {
 	genRequestId := func() string {
 		requestUuid, err := uuid.NewV4()
 		if err != nil {
@@ -102,9 +112,10 @@ func (s Server) injectRequestId(next http.HandlerFunc) http.HandlerFunc {
 		return requestUuid.String()
 	}
 
-	return func(w http.ResponseWriter, r *http.Request) {
-		next.ServeHTTP(w, r.WithContext(context.WithValue(r.Context(), KeyRequestId, genRequestId())))
-	}
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		req := r.WithContext(context.WithValue(r.Context(), KeyRequestId, genRequestId()))
+		next.ServeHTTP(w, req)
+	})
 }
 
 func (s Server) getRequestId(r *http.Request) string {
@@ -112,7 +123,6 @@ func (s Server) getRequestId(r *http.Request) string {
 	if id, ok := requestId.(string); ok {
 		return id
 	} else {
-		s.logger.Println("No request ID found")
-		return ""
+		return "<no request id found>"
 	}
 }
