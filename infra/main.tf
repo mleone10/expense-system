@@ -251,6 +251,12 @@ resource "aws_iam_role" "lambda_role" {
         Principal = {
           Service = "lambda.amazonaws.com"
         }
+      },
+      {
+        Sid      = "AllowDynamoDBAccess"
+        Action   = "*"
+        Effect   = "Allow"
+        Resource = aws_dynamodb_table.records.arn
       }
     ]
   })
@@ -312,4 +318,24 @@ resource "aws_lambda_permission" "api_lambda_permission" {
   principal     = "apigateway.amazonaws.com"
 
   source_arn = "${aws_apigatewayv2_api.api.execution_arn}/*/*"
+}
+
+# DynamoDB Infrastructure
+resource "aws_dynamodb_table" "records" {
+  name           = "${var.project_name}-records"
+  billing_mode   = "PROVISIONED"
+  write_capacity = 1
+  read_capacity  = 1
+  hash_key       = "pk"
+  range_key      = "sk"
+
+  attribute {
+    name = "pk"
+    type = "S"
+  }
+
+  attribute {
+    name = "pk"
+    type = "S"
+  }
 }
