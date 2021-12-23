@@ -251,24 +251,28 @@ resource "aws_iam_role" "lambda_role" {
         Principal = {
           Service = "lambda.amazonaws.com"
         }
-      },
-      {
-        Sid      = "AllowDynamoDBAccess"
-        Action   = "*"
-        Effect   = "Allow"
-        Resource = aws_dynamodb_table.records.arn
       }
     ]
   })
-}
 
-data "aws_iam_policy" "basic_execution_policy" {
-  arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
-}
+  inline_policy {
+    name = "dynamodb-access-policy"
+    policy = jsonencode({
+      Version = "2012-10-17"
+      Statement = [
+        {
+          Sid      = "AllowDynamoDBAccess"
+          Action   = "*"
+          Effect   = "Allow"
+          Resource = aws_dynamodb_table.records.arn
+        }
+      ]
+    })
+  }
 
-resource "aws_iam_role_policy_attachment" "basic_execution_attachment" {
-  role       = aws_iam_role.lambda_role.name
-  policy_arn = data.aws_iam_policy.basic_execution_policy.arn
+  managed_policy_arns = [
+    "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+  ]
 }
 
 resource "aws_lambda_function" "lambda" {
