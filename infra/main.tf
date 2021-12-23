@@ -335,7 +335,7 @@ resource "aws_dynamodb_table" "records" {
   }
 
   attribute {
-    name = "pk"
+    name = "sk"
     type = "S"
   }
 }
