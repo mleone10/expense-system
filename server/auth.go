@@ -1,6 +1,7 @@
 package api
 
 import (
+	"context"
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
@@ -8,6 +9,9 @@ import (
 	"net/http"
 	"net/url"
 	"strings"
+
+	"github.com/lestrrat-go/jwx/jwk"
+	"github.com/lestrrat-go/jwx/jwt"
 )
 
 type authClient struct {
@@ -29,6 +33,8 @@ type authClientConfig interface {
 	getCognitoClientId() string
 	getCognitoClientSecret() string
 }
+
+const jwkUrl string = "https://cognito-idp.us-east-1.amazonaws.com/us-east-1_hQXVbBbyZ/.well-known/jwks.json"
 
 func NewAuthClient(c authClientConfig) (*authClient, error) {
 
@@ -83,6 +89,16 @@ func (a *authClient) GetAuthTokens(authCode string) (authTokens, error) {
 	return authTokens{accessToken: tokens.Access}, nil
 }
 
-func (a *authClient) TokenIsValid(token string) (bool, error) {
+func (a *authClient) TokenIsValid(rawToken string) (bool, error) {
+	keySet, err := jwk.Fetch(context.Background(), jwkUrl)
+	if err != nil {
+		return false, fmt.Errorf("failed to fetch json web keys: %w", err)
+	}
+
+	_, err = jwt.Parse([]byte(rawToken), jwt.WithKeySet(keySet))
+	if err != nil {
+		return false, fmt.Errorf("failed to parse provided token: %w", err)
+	}
+
 	return true, nil
 }
