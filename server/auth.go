@@ -82,3 +82,7 @@ func (a *authClient) GetAuthTokens(authCode string) (authTokens, error) {
 
 	return authTokens{accessToken: tokens.Access}, nil
 }
+
+func (a *authClient) TokenIsValid(token string) (bool, error) {
+	return true, nil
+}

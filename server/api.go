@@ -19,9 +19,11 @@ type Server struct {
 	logger log.Logger
 }
 
-type KeyTypeRequestId string
+type keyTypeRequestId string
 
-const KeyRequestId KeyTypeRequestId = "requestId"
+const keyRequestId keyTypeRequestId = "requestId"
+
+const cookieNameAuthToken string = "authToken"
 
 func NewServer(c Config) (Server, error) {
 	authClient, err := NewAuthClient(c)
@@ -37,6 +39,7 @@ func NewServer(c Config) (Server, error) {
 
 	s.router.Use(s.requestId)
 	s.router.Use(s.logRequests)
+	s.router.Use(s.verifyToken)
 	s.router.Route("/api", func(r chi.Router) {
 		r.Get("/health", s.handleHealth())
 		r.Get("/token", s.handleToken())
@@ -74,7 +77,7 @@ func (s Server) handleToken() http.HandlerFunc {
 		}
 
 		http.SetCookie(w, &http.Cookie{
-			Name:     "authToken",
+			Name:     cookieNameAuthToken,
 			Value:    ats.accessToken,
 			HttpOnly: true,
 			Expires:  time.Now().Add(time.Hour * 168),
@@ -113,16 +116,42 @@ func (s Server) requestId(next http.Handler) http.Handler {
 	}
 
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		req := r.WithContext(context.WithValue(r.Context(), KeyRequestId, genRequestId()))
+		req := r.WithContext(context.WithValue(r.Context(), keyRequestId, genRequestId()))
 		next.ServeHTTP(w, req)
 	})
 }
 
 func (s Server) getRequestId(r *http.Request) string {
-	requestId := r.Context().Value(KeyRequestId)
+	requestId := r.Context().Value(keyRequestId)
 	if id, ok := requestId.(string); ok {
 		return id
 	} else {
 		return "<no request id found>"
 	}
+}
+
+func (s Server) verifyToken(next http.Handler) http.Handler {
+	markUnauthorized := func(w http.ResponseWriter) {
+		http.Error(w, "unauthorized", http.StatusUnauthorized)
+	}
+
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		tokenCookie, err := r.Cookie(cookieNameAuthToken)
+		if err != nil {
+			markUnauthorized(w)
+			return
+		}
+
+		ok, err := s.auth.TokenIsValid(tokenCookie.Value)
+		if err != nil {
+			s.error(w, r, fmt.Errorf("error while verifying auth token: %w", err))
+			return
+		}
+		if !ok {
+			markUnauthorized(w)
+			return
+		}
+
+		next.ServeHTTP(w, r)
+	})
 }
