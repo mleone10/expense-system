@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"io/ioutil"
 	"net/http"
 	"net/url"
 	"strings"
@@ -74,7 +75,9 @@ func (a *authClient) GetAuthTokens(authCode string) (authTokens, error) {
 		return authTokens{}, fmt.Errorf("request to token endpoint failed: %w", err)
 	}
 	if res.StatusCode != http.StatusOK {
-		return authTokens{}, fmt.Errorf("received non-OK response from token endpoint: %v", res.Status)
+		defer res.Body.Close()
+		body, _ := ioutil.ReadAll(res.Body)
+		return authTokens{}, fmt.Errorf("received non-OK response from token endpoint: %v (%v)", res.Status, string(body))
 	}
 
 	defer res.Body.Close()
