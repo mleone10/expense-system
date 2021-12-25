@@ -37,15 +37,20 @@ func NewServer(c Config) (Server, error) {
 		logger: *log.New(os.Stderr, "", log.LstdFlags),
 	}
 
-	s.router.Use(s.requestId)
-	s.router.Use(s.logRequests)
-	s.router.Use(s.verifyToken)
 	s.router.Route("/api", func(r chi.Router) {
+		r.Use(s.requestId)
+		r.Use(s.logRequests)
+
 		r.Get("/health", s.handleHealth())
 		r.Get("/token", s.handleToken())
-		r.Route("/orgs", handleOrgs())
-		r.Route("/users", func(r chi.Router) {
-			r.Route("/{userID}", func(r chi.Router) {
+
+		r.Group(func(r chi.Router) {
+			r.Use(s.verifyToken)
+
+			r.Route("/orgs", handleOrgs())
+			r.Route("/users", func(r chi.Router) {
+				r.Route("/{userID}", func(r chi.Router) {
+				})
 			})
 		})
 	})
