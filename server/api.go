@@ -79,6 +79,7 @@ func (s Server) handleToken() http.HandlerFunc {
 		ats, err := s.auth.GetAuthTokens(r.URL.Query().Get("code"))
 		if err != nil {
 			s.error(w, r, fmt.Errorf("failed to get auth tokens: %w", err))
+			return
 		}
 
 		http.SetCookie(w, &http.Cookie{
