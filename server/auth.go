@@ -35,6 +35,10 @@ type authClientConfig interface {
 	getCognitoClientSecret() string
 }
 
+type accessToken struct {
+	validatedToken jwt.Token
+}
+
 const jwkUrl string = "https://cognito-idp.us-east-1.amazonaws.com/us-east-1_hQXVbBbyZ/.well-known/jwks.json"
 
 func NewAuthClient(c authClientConfig) (*authClient, error) {
@@ -92,16 +96,20 @@ func (a *authClient) GetAuthTokens(authCode string) (authTokens, error) {
 	return authTokens{accessToken: tokens.Access}, nil
 }
 
-func (a *authClient) TokenIsValid(rawToken string) (bool, error) {
+func (a *authClient) TokenIsValid(rawToken string) (accessToken, error) {
 	keySet, err := jwk.Fetch(context.Background(), jwkUrl)
 	if err != nil {
-		return false, fmt.Errorf("failed to fetch json web keys: %w", err)
+		return accessToken{}, fmt.Errorf("failed to fetch json web keys: %w", err)
 	}
 
-	_, err = jwt.Parse([]byte(rawToken), jwt.WithKeySet(keySet))
+	token, err := jwt.Parse([]byte(rawToken), jwt.WithKeySet(keySet))
 	if err != nil {
-		return false, fmt.Errorf("failed to parse provided token: %w", err)
+		return accessToken{}, fmt.Errorf("failed to parse provided token: %w", err)
 	}
 
-	return true, nil
+	return accessToken{validatedToken: token}, nil
+}
+
+func (t accessToken) UserId() string {
+	return t.validatedToken.Subject()
 }

@@ -17,13 +17,18 @@ type Server struct {
 	auth   *authClient
 	router chi.Router
 	logger log.Logger
+	orgs   orgRepo
 }
 
 type keyTypeRequestId string
+type keyTypeUserId string
 
 const keyRequestId keyTypeRequestId = "requestId"
+const keyUserId keyTypeUserId = "userId"
 
 const cookieNameAuthToken string = "authToken"
+
+const urlParamOrgId string = "orgId"
 
 func NewServer(c Config) (Server, error) {
 	authClient, err := NewAuthClient(c)
@@ -31,10 +36,16 @@ func NewServer(c Config) (Server, error) {
 		return Server{}, fmt.Errorf("failed to initialize auth client: %w", err)
 	}
 
+	orgRepo, err := NewOrgRepo()
+	if err != nil {
+		return Server{}, fmt.Errorf("failed to initialize org repo: %w", err)
+	}
+
 	s := Server{
 		auth:   authClient,
 		router: chi.NewRouter(),
 		logger: *log.New(os.Stderr, "", log.LstdFlags),
+		orgs:   orgRepo,
 	}
 
 	s.router.Route("/api", func(r chi.Router) {
@@ -47,7 +58,16 @@ func NewServer(c Config) (Server, error) {
 		r.Group(func(r chi.Router) {
 			r.Use(s.verifyToken)
 
-			r.Route("/orgs", handleOrgs())
+			r.Route("/orgs", func(r chi.Router) {
+				r.Get("/", s.handleGetOrgs())
+				r.Post("/", s.handleCreateNewOrg())
+				r.Route(fmt.Sprintf("/{%s}", urlParamOrgId), func(r chi.Router) {
+					r.Get("/", s.handleGetOrg())
+					r.Post("/", s.handleUpdateOrg())
+					r.Delete("/", s.handleDeleteOrg())
+				})
+			})
+
 			r.Route("/users", func(r chi.Router) {
 				r.Route("/{userID}", func(r chi.Router) {
 				})
@@ -89,6 +109,68 @@ func (s Server) handleToken() http.HandlerFunc {
 			Expires:  time.Now().Add(time.Hour * 168),
 		})
 		w.WriteHeader(http.StatusOK)
+	})
+}
+
+func (s Server) handleGetOrgs() http.HandlerFunc {
+	type org struct {
+		Name string `json:"name"`
+		Id   string `json:"id"`
+	}
+
+	type response struct {
+		Orgs []org `json:"orgs"`
+	}
+
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		userId, err := s.getUserId(r)
+		if err != nil {
+			s.error(w, r, fmt.Errorf("failed to get user id from request: %w", err))
+			return
+		}
+
+		orgs, err := s.orgs.getOrgsForUser(userId)
+		if err != nil {
+			s.error(w, r, fmt.Errorf("failed to retrieve orgs for user %v: %w", userId, err))
+			return
+		}
+
+		res := response{Orgs: []org{}}
+		for _, o := range orgs {
+			res.Orgs = append(res.Orgs, org{
+				Name: o.Name,
+				Id:   o.Id,
+			})
+		}
+
+		json.NewEncoder(w).Encode(res)
+	})
+}
+
+func (s Server) handleCreateNewOrg() http.HandlerFunc {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+
+	})
+}
+
+func (s Server) handleGetOrg() http.HandlerFunc {
+	type response struct {
+	}
+
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+
+	})
+}
+
+func (s Server) handleUpdateOrg() http.HandlerFunc {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+
+	})
+}
+
+func (s Server) handleDeleteOrg() http.HandlerFunc {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+
 	})
 }
 
@@ -137,6 +219,15 @@ func (s Server) getRequestId(r *http.Request) string {
 	}
 }
 
+func (s Server) getUserId(r *http.Request) (string, error) {
+	userId := r.Context().Value(keyUserId)
+	if id, ok := userId.(string); !ok {
+		return "", fmt.Errorf("failed to convert user id to string")
+	} else {
+		return id, nil
+	}
+}
+
 func (s Server) verifyToken(next http.Handler) http.Handler {
 	markUnauthorized := func(w http.ResponseWriter) {
 		http.Error(w, "unauthorized", http.StatusUnauthorized)
@@ -149,16 +240,13 @@ func (s Server) verifyToken(next http.Handler) http.Handler {
 			return
 		}
 
-		ok, err := s.auth.TokenIsValid(tokenCookie.Value)
+		validatedToken, err := s.auth.TokenIsValid(tokenCookie.Value)
 		if err != nil {
 			s.error(w, r, fmt.Errorf("error while verifying auth token: %w", err))
 			return
 		}
-		if !ok {
-			markUnauthorized(w)
-			return
-		}
 
-		next.ServeHTTP(w, r)
+		req := r.WithContext(context.WithValue(r.Context(), keyUserId, validatedToken.UserId()))
+		next.ServeHTTP(w, req)
 	})
 }
