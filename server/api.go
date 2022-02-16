@@ -88,7 +88,7 @@ func (s Server) handleHealth() http.HandlerFunc {
 	}
 
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		json.NewEncoder(w).Encode(response{
+		s.writeResponse(w, response{
 			Status: "ok",
 		})
 	})
@@ -143,13 +143,33 @@ func (s Server) handleGetOrgs() http.HandlerFunc {
 			})
 		}
 
-		json.NewEncoder(w).Encode(res)
+		s.writeResponse(w, res)
 	})
 }
 
 func (s Server) handleCreateNewOrg() http.HandlerFunc {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	type request struct {
+		Name string `json:"name"`
+	}
 
+	type response struct {
+		Id string `json:"id"`
+	}
+
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		var req request
+		if err := s.readRequest(r, &req); err != nil {
+			s.error(w, r, fmt.Errorf("failed to read org creation request: %w", err))
+			return
+		}
+
+		id, err := s.orgs.createOrg(req.Name)
+		if err != nil {
+			s.error(w, r, fmt.Errorf("failed to create org with name %v: %w", req.Name, err))
+			return
+		}
+
+		s.writeResponse(w, response{Id: id})
 	})
 }
 
@@ -177,6 +197,14 @@ func (s Server) handleDeleteOrg() http.HandlerFunc {
 func (s Server) error(w http.ResponseWriter, r *http.Request, err error) {
 	http.Error(w, "internal server error", http.StatusInternalServerError)
 	s.logger.Printf("Request: %s %v", s.getRequestId(r), err)
+}
+
+func (s Server) readRequest(r *http.Request, dest interface{}) error {
+	return json.NewDecoder(r.Body).Decode(dest)
+}
+
+func (s Server) writeResponse(w http.ResponseWriter, src interface{}) error {
+	return json.NewEncoder(w).Encode(src)
 }
 
 func (s Server) logRequests(next http.Handler) http.Handler {

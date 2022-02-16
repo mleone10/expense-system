@@ -10,6 +10,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/dynamodb"
 	"github.com/aws/aws-sdk-go-v2/service/dynamodb/types"
 	"github.com/aws/aws-sdk-go/aws"
+	"github.com/gofrs/uuid"
 )
 
 type orgRepo struct {
@@ -24,6 +25,12 @@ type org struct {
 type tableRecord struct {
 	Pk string
 	Sk string
+}
+
+type orgRecord struct {
+	Pk   string `dynamodbav:"pk"`
+	Sk   string `dynamodbav:"sk"`
+	Name string `dynamodbav:"name"`
 }
 
 const tableName string = "expense-system-records"
@@ -44,8 +51,8 @@ func (o orgRepo) getOrgsForUser(userId string) ([]org, error) {
 		TableName:              aws.String(tableName),
 		KeyConditionExpression: aws.String("pk = :userId and begins_with(sk, :membershipPrefix)"),
 		ExpressionAttributeValues: map[string]types.AttributeValue{
-			":userId":           &types.AttributeValueMemberS{Value: userId},
-			":membershipPrefix": &types.AttributeValueMemberS{Value: "MEMBER#"},
+			":userId":           &types.AttributeValueMemberS{Value: fmt.Sprintf("USER#%s", userId)},
+			":membershipPrefix": &types.AttributeValueMemberS{Value: "ORG#"},
 		},
 	})
 	if err != nil {
@@ -72,15 +79,10 @@ func (o orgRepo) getOrgsForUser(userId string) ([]org, error) {
 }
 
 func (o orgRepo) getOrgName(orgId string) (string, error) {
-	type orgRecord struct {
-		tableRecord
-		Name string
-	}
-
 	res, err := o.db.GetItem(context.Background(), &dynamodb.GetItemInput{
 		TableName: aws.String(tableName),
 		Key: map[string]types.AttributeValue{
-			"pk": &types.AttributeValueMemberS{Value: orgId},
+			"pk": &types.AttributeValueMemberS{Value: fmt.Sprintf("ORG#%s", orgId)},
 			"sk": &types.AttributeValueMemberS{Value: "ORG"},
 		},
 	})
@@ -92,4 +94,33 @@ func (o orgRepo) getOrgName(orgId string) (string, error) {
 	attributevalue.UnmarshalMap(res.Item, &or)
 
 	return or.Name, nil
+}
+
+func (o orgRepo) createOrg(name string) (string, error) {
+	id, err := newId()
+	if err != nil {
+		return "", fmt.Errorf("failed to generate new org id: %w", err)
+	}
+
+	item, err := attributevalue.MarshalMap(orgRecord{
+		Pk:   fmt.Sprintf("ORG#%v", id),
+		Sk:   "ORG",
+		Name: name,
+	})
+
+	// TODO: Org creation is working, just need to link to active user with a second write
+	_, err = o.db.PutItem(context.Background(), &dynamodb.PutItemInput{
+		TableName: aws.String(tableName),
+		Item:      item,
+	})
+	if err != nil {
+		return "", fmt.Errorf("failed to write new organization to database: %w", err)
+	}
+
+	return id, nil
+}
+
+func newId() (string, error) {
+	id, err := uuid.NewV4()
+	return id.String(), err
 }
