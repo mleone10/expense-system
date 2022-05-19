@@ -14,6 +14,7 @@ func main() {
 		CognitoClientSecret: os.Getenv("COGNITO_CLIENT_SECRET"),
 		ClientHostname:      "localhost:3000",
 		ClientScheme:        "http",
+		SkipAuth:            true,
 	})
 	if err != nil {
 		log.Fatalf("Failed to initialize server: %v", err)

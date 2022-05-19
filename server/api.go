@@ -30,6 +30,8 @@ const cookieNameAuthToken string = "authToken"
 
 const urlParamOrgId string = "orgId"
 
+const testAdminUserId string = "nonProdTestAdmin"
+
 func NewServer(c Config) (Server, error) {
 	authClient, err := NewAuthClient(c)
 	if err != nil {
@@ -48,6 +50,11 @@ func NewServer(c Config) (Server, error) {
 		orgs:   orgRepo,
 	}
 
+	tokenVerifierMiddleware := s.verifyToken
+	if c.getSkipAuth() {
+		tokenVerifierMiddleware = s.noOpTokenVerifier
+	}
+
 	s.router.Route("/api", func(r chi.Router) {
 		r.Use(s.requestId)
 		r.Use(s.logRequests)
@@ -56,7 +63,7 @@ func NewServer(c Config) (Server, error) {
 		r.Get("/token", s.handleToken())
 
 		r.Group(func(r chi.Router) {
-			r.Use(s.verifyToken)
+			r.Use(tokenVerifierMiddleware)
 
 			r.Route("/orgs", func(r chi.Router) {
 				r.Get("/", s.handleGetOrgs())
@@ -275,6 +282,13 @@ func (s Server) verifyToken(next http.Handler) http.Handler {
 		}
 
 		req := r.WithContext(context.WithValue(r.Context(), keyUserId, validatedToken.UserId()))
+		next.ServeHTTP(w, req)
+	})
+}
+
+func (s Server) noOpTokenVerifier(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		req := r.WithContext(context.WithValue(r.Context(), keyUserId, testAdminUserId))
 		next.ServeHTTP(w, req)
 	})
 }
