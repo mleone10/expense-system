@@ -121,8 +121,9 @@ func (s Server) handleToken() http.HandlerFunc {
 
 func (s Server) handleGetOrgs() http.HandlerFunc {
 	type org struct {
-		Name string `json:"name"`
-		Id   string `json:"id"`
+		Name  string `json:"name"`
+		Id    string `json:"id"`
+		Admin bool   `json:"admin"`
 	}
 
 	type response struct {
@@ -145,8 +146,9 @@ func (s Server) handleGetOrgs() http.HandlerFunc {
 		res := response{Orgs: []org{}}
 		for _, o := range orgs {
 			res.Orgs = append(res.Orgs, org{
-				Name: o.Name,
-				Id:   o.Id,
+				Name:  o.Name,
+				Id:    o.Id,
+				Admin: o.Admin,
 			})
 		}
 
@@ -170,7 +172,13 @@ func (s Server) handleCreateNewOrg() http.HandlerFunc {
 			return
 		}
 
-		id, err := s.orgs.createOrg(req.Name)
+		userId, err := s.getUserId(r)
+		if err != nil {
+			s.error(w, r, fmt.Errorf("failed to get user id from request: %w", err))
+			return
+		}
+
+		id, err := s.orgs.createOrg(req.Name, userId)
 		if err != nil {
 			s.error(w, r, fmt.Errorf("failed to create org with name %v: %w", req.Name, err))
 			return
