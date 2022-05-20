@@ -13,21 +13,30 @@ import (
 	"github.com/gofrs/uuid"
 )
 
+type role string
+
+const (
+	RoleAdmin    role = "ADMIN"
+	RoleApprover role = "APPROVER"
+	RoleUser     role = "USER"
+)
+
 type orgRepo struct {
-	db    *dynamodb.Client
-	table *string
+	db               *dynamodb.Client
+	table            *string
+	reverseLookupGsi *string
 }
 
 type orgRecord struct {
-	Pk   string `dynamodbav:"pk"`
-	Sk   string `dynamodbav:"sk"`
-	Name string `dynamodbav:"name"`
+	OrgId         string `dynamodbav:"pk"`
+	OrgPrimaryKey string `dynamodbav:"sk"`
+	Name          string `dynamodbav:"name"`
 }
 
-type userOrgRecord struct {
-	Pk    string `dynamodbav:"pk"`
-	Sk    string `dynamodbav:"sk"`
-	Admin bool   `dynamodbav:"admin"`
+type orgUserRecord struct {
+	OrgId     string `dynamodbav:"pk"`
+	UserIdKey string `dynamodbav:"sk"`
+	Role      role   `dynamodbav:"role"`
 }
 
 func NewOrgRepo() (orgRepo, error) {
@@ -37,44 +46,50 @@ func NewOrgRepo() (orgRepo, error) {
 	}
 
 	return orgRepo{
-		db:    dynamodb.NewFromConfig(cfg),
-		table: aws.String("expense-system-records"),
+		db:               dynamodb.NewFromConfig(cfg),
+		table:            aws.String("expense-system-records"),
+		reverseLookupGsi: aws.String("reverse-lookup"),
 	}, nil
 }
 
 type UserOrg struct {
-	Name  string
-	Id    string
-	Admin bool
+	Name string
+	Id   string
+	Role role
+}
+
+func (uo UserOrg) IsAdmin() bool {
+	return uo.Role == RoleAdmin
 }
 
 func (o orgRepo) getOrgsForUser(userId string) ([]UserOrg, error) {
 	res, err := o.db.Query(context.Background(), &dynamodb.QueryInput{
 		TableName:              o.table,
-		KeyConditionExpression: aws.String("pk = :userId and begins_with(sk, :membershipPrefix)"),
+		IndexName:              o.reverseLookupGsi,
+		KeyConditionExpression: aws.String("sk = :userId and begins_with(pk, :orgPrefix)"),
 		ExpressionAttributeValues: map[string]types.AttributeValue{
-			":userId":           &types.AttributeValueMemberS{Value: fmt.Sprintf("USER#%s", userId)},
-			":membershipPrefix": &types.AttributeValueMemberS{Value: "ORG#"},
+			":userId":    &types.AttributeValueMemberS{Value: fmt.Sprintf("USER#%s", userId)},
+			":orgPrefix": &types.AttributeValueMemberS{Value: "ORG#"},
 		},
 	})
 	if err != nil {
 		return nil, fmt.Errorf("failed to fetch orgs from dynamodb for user %v: %w", userId, err)
 	}
 
-	uors := []userOrgRecord{}
-	attributevalue.UnmarshalListOfMaps(res.Items, &uors)
+	records := []orgUserRecord{}
+	attributevalue.UnmarshalListOfMaps(res.Items, &records)
 
 	orgs := []UserOrg{}
-	for _, uor := range uors {
-		orgId := strings.Split(uor.Sk, "#")[1]
+	for _, r := range records {
+		orgId := strings.Split(r.OrgId, "#")[1]
 		orgName, err := o.getOrgName(orgId)
 		if err != nil {
 			return nil, fmt.Errorf("failed to retrieve name for org %v: %w", orgId, err)
 		}
 		orgs = append(orgs, UserOrg{
-			Id:    orgId,
-			Name:  orgName,
-			Admin: uor.Admin,
+			Id:   orgId,
+			Name: orgName,
+			Role: r.Role,
 		})
 	}
 
@@ -99,26 +114,26 @@ func (o orgRepo) getOrgName(orgId string) (string, error) {
 	return or.Name, nil
 }
 
-func (o orgRepo) createOrg(name, admin string) (string, error) {
+func (o orgRepo) createOrg(name, adminId string) (string, error) {
 	id, err := newId()
 	if err != nil {
 		return "", fmt.Errorf("failed to generate new org id: %w", err)
 	}
 
 	orgItem, err := attributevalue.MarshalMap(orgRecord{
-		Pk:   fmt.Sprintf("ORG#%v", id),
-		Sk:   "ORG",
-		Name: name,
+		OrgId:         fmt.Sprintf("ORG#%v", id),
+		OrgPrimaryKey: "ORG",
+		Name:          name,
 	})
 
 	if err != nil {
 		return "", fmt.Errorf("failed to marshal new org record: %w", err)
 	}
 
-	orgAdminItem, err := attributevalue.MarshalMap(userOrgRecord{
-		Pk:    fmt.Sprintf("USER#%v", admin),
-		Sk:    fmt.Sprintf("ORG#%v", id),
-		Admin: true,
+	orgAdminItem, err := attributevalue.MarshalMap(orgUserRecord{
+		OrgId:     fmt.Sprintf("USER#%v", adminId),
+		UserIdKey: fmt.Sprintf("ORG#%v", id),
+		Role:      RoleAdmin,
 	})
 
 	if err != nil {
@@ -141,6 +156,9 @@ func (o orgRepo) createOrg(name, admin string) (string, error) {
 			},
 		},
 	})
+	if err != nil {
+		return "", fmt.Errorf("failed to save new org and admin records: %w", err)
+	}
 
 	return id, nil
 }

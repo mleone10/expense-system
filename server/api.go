@@ -148,7 +148,7 @@ func (s Server) handleGetOrgs() http.HandlerFunc {
 			res.Orgs = append(res.Orgs, org{
 				Name:  o.Name,
 				Id:    o.Id,
-				Admin: o.Admin,
+				Admin: o.IsAdmin(),
 			})
 		}
 
