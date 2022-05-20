@@ -14,18 +14,8 @@ import (
 )
 
 type orgRepo struct {
-	db *dynamodb.Client
-}
-
-type UserOrg struct {
-	Name  string
-	Id    string
-	Admin bool
-}
-
-type tableRecord struct {
-	Pk string
-	Sk string
+	db    *dynamodb.Client
+	table *string
 }
 
 type orgRecord struct {
@@ -40,8 +30,6 @@ type userOrgRecord struct {
 	Admin bool   `dynamodbav:"admin"`
 }
 
-const tableName string = "expense-system-records"
-
 func NewOrgRepo() (orgRepo, error) {
 	cfg, err := config.LoadDefaultConfig(context.Background(), config.WithRegion("us-east-1"))
 	if err != nil {
@@ -49,13 +37,20 @@ func NewOrgRepo() (orgRepo, error) {
 	}
 
 	return orgRepo{
-		db: dynamodb.NewFromConfig(cfg),
+		db:    dynamodb.NewFromConfig(cfg),
+		table: aws.String("expense-system-records"),
 	}, nil
+}
+
+type UserOrg struct {
+	Name  string
+	Id    string
+	Admin bool
 }
 
 func (o orgRepo) getOrgsForUser(userId string) ([]UserOrg, error) {
 	res, err := o.db.Query(context.Background(), &dynamodb.QueryInput{
-		TableName:              aws.String(tableName),
+		TableName:              o.table,
 		KeyConditionExpression: aws.String("pk = :userId and begins_with(sk, :membershipPrefix)"),
 		ExpressionAttributeValues: map[string]types.AttributeValue{
 			":userId":           &types.AttributeValueMemberS{Value: fmt.Sprintf("USER#%s", userId)},
@@ -88,7 +83,7 @@ func (o orgRepo) getOrgsForUser(userId string) ([]UserOrg, error) {
 
 func (o orgRepo) getOrgName(orgId string) (string, error) {
 	res, err := o.db.GetItem(context.Background(), &dynamodb.GetItemInput{
-		TableName: aws.String(tableName),
+		TableName: o.table,
 		Key: map[string]types.AttributeValue{
 			"pk": &types.AttributeValueMemberS{Value: fmt.Sprintf("ORG#%s", orgId)},
 			"sk": &types.AttributeValueMemberS{Value: "ORG"},
@@ -134,13 +129,13 @@ func (o orgRepo) createOrg(name, admin string) (string, error) {
 		TransactItems: []types.TransactWriteItem{
 			{
 				Put: &types.Put{
-					TableName: aws.String(tableName),
+					TableName: o.table,
 					Item:      orgItem,
 				},
 			},
 			{
 				Put: &types.Put{
-					TableName: aws.String(tableName),
+					TableName: o.table,
 					Item:      orgAdminItem,
 				},
 			},
