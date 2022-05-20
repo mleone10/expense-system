@@ -30,6 +30,8 @@ const cookieNameAuthToken string = "authToken"
 
 const urlParamOrgId string = "orgId"
 
+const testAdminUserId string = "nonProdTestAdmin"
+
 func NewServer(c Config) (Server, error) {
 	authClient, err := NewAuthClient(c)
 	if err != nil {
@@ -48,6 +50,11 @@ func NewServer(c Config) (Server, error) {
 		orgs:   orgRepo,
 	}
 
+	tokenVerifierMiddleware := s.verifyToken
+	if c.getSkipAuth() {
+		tokenVerifierMiddleware = s.noOpTokenVerifier
+	}
+
 	s.router.Route("/api", func(r chi.Router) {
 		r.Use(s.requestId)
 		r.Use(s.logRequests)
@@ -56,7 +63,7 @@ func NewServer(c Config) (Server, error) {
 		r.Get("/token", s.handleToken())
 
 		r.Group(func(r chi.Router) {
-			r.Use(s.verifyToken)
+			r.Use(tokenVerifierMiddleware)
 
 			r.Route("/orgs", func(r chi.Router) {
 				r.Get("/", s.handleGetOrgs())
@@ -88,7 +95,7 @@ func (s Server) handleHealth() http.HandlerFunc {
 	}
 
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		json.NewEncoder(w).Encode(response{
+		s.writeResponse(w, response{
 			Status: "ok",
 		})
 	})
@@ -114,8 +121,9 @@ func (s Server) handleToken() http.HandlerFunc {
 
 func (s Server) handleGetOrgs() http.HandlerFunc {
 	type org struct {
-		Name string `json:"name"`
-		Id   string `json:"id"`
+		Name  string `json:"name"`
+		Id    string `json:"id"`
+		Admin bool   `json:"admin"`
 	}
 
 	type response struct {
@@ -138,18 +146,45 @@ func (s Server) handleGetOrgs() http.HandlerFunc {
 		res := response{Orgs: []org{}}
 		for _, o := range orgs {
 			res.Orgs = append(res.Orgs, org{
-				Name: o.Name,
-				Id:   o.Id,
+				Name:  o.Name,
+				Id:    o.Id,
+				Admin: o.Admin,
 			})
 		}
 
-		json.NewEncoder(w).Encode(res)
+		s.writeResponse(w, res)
 	})
 }
 
 func (s Server) handleCreateNewOrg() http.HandlerFunc {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	type request struct {
+		Name string `json:"name"`
+	}
 
+	type response struct {
+		Id string `json:"id"`
+	}
+
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		var req request
+		if err := s.readRequest(r, &req); err != nil {
+			s.error(w, r, fmt.Errorf("failed to read org creation request: %w", err))
+			return
+		}
+
+		userId, err := s.getUserId(r)
+		if err != nil {
+			s.error(w, r, fmt.Errorf("failed to get user id from request: %w", err))
+			return
+		}
+
+		id, err := s.orgs.createOrg(req.Name, userId)
+		if err != nil {
+			s.error(w, r, fmt.Errorf("failed to create org with name %v: %w", req.Name, err))
+			return
+		}
+
+		s.writeResponse(w, response{Id: id})
 	})
 }
 
@@ -177,6 +212,14 @@ func (s Server) handleDeleteOrg() http.HandlerFunc {
 func (s Server) error(w http.ResponseWriter, r *http.Request, err error) {
 	http.Error(w, "internal server error", http.StatusInternalServerError)
 	s.logger.Printf("Request: %s %v", s.getRequestId(r), err)
+}
+
+func (s Server) readRequest(r *http.Request, dest interface{}) error {
+	return json.NewDecoder(r.Body).Decode(dest)
+}
+
+func (s Server) writeResponse(w http.ResponseWriter, src interface{}) error {
+	return json.NewEncoder(w).Encode(src)
 }
 
 func (s Server) logRequests(next http.Handler) http.Handler {
@@ -247,6 +290,13 @@ func (s Server) verifyToken(next http.Handler) http.Handler {
 		}
 
 		req := r.WithContext(context.WithValue(r.Context(), keyUserId, validatedToken.UserId()))
+		next.ServeHTTP(w, req)
+	})
+}
+
+func (s Server) noOpTokenVerifier(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		req := r.WithContext(context.WithValue(r.Context(), keyUserId, testAdminUserId))
 		next.ServeHTTP(w, req)
 	})
 }

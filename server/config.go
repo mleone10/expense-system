@@ -5,6 +5,7 @@ type Config struct {
 	CognitoClientSecret string
 	ClientHostname      string
 	ClientScheme        string
+	SkipAuth            bool
 }
 
 func (c Config) getClientHostname() string {
@@ -21,4 +22,8 @@ func (c Config) getCognitoClientId() string {
 
 func (c Config) getCognitoClientSecret() string {
 	return c.CognitoClientSecret
+}
+
+func (c Config) getSkipAuth() bool {
+	return c.SkipAuth
 }
