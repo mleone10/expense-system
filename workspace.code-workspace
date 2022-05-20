@@ -7,5 +7,17 @@
 			"path": "server"
 		}
 	],
-	"settings": {}
+	"settings": {},
+	"launch": {
+		"version": "0.2.0",
+		"configurations": [
+			{
+				"name": "Debug Package",
+				"type": "go",
+				"request": "launch",
+				"mode": "debug",
+				"program": "${workspaceFolder:server}/cmd/localserver/main.go"
+			}
+		]
+	}
 }
