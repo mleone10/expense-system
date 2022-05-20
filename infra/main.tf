@@ -343,4 +343,13 @@ resource "aws_dynamodb_table" "records" {
     name = "sk"
     type = "S"
   }
+
+  global_secondary_index {
+    name            = "reverse-lookup"
+    hash_key        = "sk"
+    range_key       = "pk"
+    write_capacity  = 1
+    read_capacity   = 1
+    projection_type = "ALL"
+  }
 }
