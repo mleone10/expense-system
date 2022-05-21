@@ -20,7 +20,6 @@ main {
 
 footer {
   margin-bottom: 1em;
-  flex-direction: column;
   text-align: center;
   opacity: 0.65;
   font-size: 0.75em;
@@ -28,6 +27,10 @@ footer {
 
 footer>p {
   margin: 0.2em auto;
+}
+
+footer a {
+  color: black;
 }
 
 .unauthenticated-app {
