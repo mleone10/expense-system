@@ -6,47 +6,38 @@ import { useEffect } from 'react';
 
 function App() {
   return (
-    <div className="app">
-      <AuthProvider>
-        <AppHeader />
-        <AppContent />
-        <AppFooter />
-      </AuthProvider>
-    </div>
+    <AuthProvider>
+      <AppHeader />
+      <AppContent />
+      <AppFooter />
+    </AuthProvider>
   );
 }
 
 function AppHeader() {
   return (
-    <header className="header">
-      <div className="header-block">
-        <h1 className="header-title">Expense System</h1>
-        <p className="header-subtitle">
-          Reimbursement simplified.
-        </p>
-      </div>
-      <div className="header-block">
-        {useAuth().getIsSignedIn() ? <SignOutButton /> : <SignInButton />}
-      </div>
+    <header className="bound-width">
+      <h1>Expense System</h1>
+      <p>Reimbursement simplified.</p>
     </header>
   )
 }
 
 function AppContent() {
   return (
-    <div className="app-content">
+    <main className=" bound-width">
       <Routes>
         <Route path="/" element={useAuth().getIsSignedIn() ? <AuthenticatedApp /> : <UnauthenticatedApp />} />
         <Route path="/auth/callback" element={<AuthCallback />} />
       </Routes>
-    </div>
+    </main>
   )
 }
 
 function AppFooter() {
   return (
-    <footer className="app-footer">
-      <p>Copyright &copy; 2021 <a href="https://twitter.com/mleone5244">Mario Leone</a></p>
+    <footer className="bound-width">
+      <p>&copy; <a href="https://twitter.com/mleone5244">Mario Leone</a></p>
       <p>Money icon by <a href="https://icons8.com">Icons8</a></p>
     </footer>
   )
@@ -55,33 +46,26 @@ function AppFooter() {
 function SignInButton() {
   const signInLink = `https://auth.expense.mleone.dev/login?client_id=6ka3m790cv5hrhjdqt2ju89v45&response_type=code&scope=email+openid+profile&redirect_uri=${process.env.NODE_ENV === "development" ? 'http://localhost:3000' : 'https://expense.mleone.dev'}/auth/callback`
   return (
-    <a href={signInLink} className="header-button">
+    <a href={signInLink} className="sign-in-button">
       Sign In
     </a>
   )
 }
 
-function SignOutButton() {
-  return (
-    <button className="header-button" onClick={useAuth().signOut}>
-      Sign Out
-    </button>
-  )
-}
-
 function AuthenticatedApp() {
   return (
-    <div>
+    <p>
       Welcome known user!
-    </div>
+    </p>
   )
 }
 
 function UnauthenticatedApp() {
   return (
-    <div>
-      Welcome stranger!
-    </div>
+    <section className="unauthenticated-app">
+      <p>Please sign in to continue:</p>
+      <SignInButton />
+    </section>
   )
 }
 

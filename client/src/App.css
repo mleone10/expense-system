@@ -1,79 +1,79 @@
 @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@500&display=swap');
 
 body {
-  /* background-color: #283618; */
   background-color: #fefae0;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
   font-family: 'Roboto', sans-serif;
-}
-
-.app {
-  max-width: 900px;
-  width: 90vw;
-  display: flex;
-  flex-direction: column;
   min-height: 100vh;
 }
 
-.app-content {
+.bound-width {
+  width: 90%;
+}
+
+main {
   flex: 1;
 }
 
-.app-footer {
+footer {
   margin-bottom: 1em;
   text-align: center;
   opacity: 0.65;
   font-size: 0.75em;
-  line-height: 0.6em;
 }
 
-.header {
-  display: flex;
+footer>p {
+  margin: 0.2em auto;
+}
+
+footer a {
+  color: black;
+}
+
+.unauthenticated-app {
+  text-align: center;
+}
+
+header {
   justify-content: space-between;
   margin-top: 1em;
+  text-align: center;
 }
 
-.header-block {
-  display: flex;
-  flex-direction: column;
-}
-
-.header-title {
+header>h1 {
   margin: 0;
   color: #6f7852;
   font-weight: normal;
 }
 
-.header-subtitle {
+header>p {
   margin-top: 0.2em;
 }
 
-.header-button {
+.sign-in-button {
+  display: block;
   color: #fefae0;
   background-color: #6f7852;
   padding: 0.7em;
+  margin: auto;
   border-radius: 5px;
-  border-width: 0px;
   text-decoration: none;
 }
 
-@media only screen and (max-device-width: 667px) {
-  #root {
-    width: 90%;
+@media only screen and (min-device-width: 667px) {
+  header {
+    text-align: left;
   }
 
-  .app {
-    min-width: unset;
+  .bound-width {
+    max-width: 900px;
+    width: 90vw;
   }
 
-  .header {
-    flex-direction: column;
-  }
-
-  .header-block {
-    text-align: center;
+  a.sign-in-button {
+    width: 15em;
   }
 }
