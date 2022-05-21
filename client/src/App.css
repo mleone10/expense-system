@@ -1,7 +1,14 @@
 @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@500&display=swap');
 
+html {
+  --color-background: #fefae0;
+  --color-primary: #6f7852;
+  --color-accent-dark: #424634;
+  --color-accent-light: #f8f7f1;
+}
+
 body {
-  background-color: #fefae0;
+  background-color: var(--color-background);
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -19,18 +26,22 @@ main {
 }
 
 footer {
-  margin-bottom: 1em;
+  background-color: var(--color-accent-dark);
+  box-shadow: 0rem -0.25rem var(--color-primary);
+  width: 100%;
+  padding: 0.5em 0;
   text-align: center;
-  opacity: 0.65;
   font-size: 0.75em;
 }
 
 footer>p {
+  opacity: 0.6;
   margin: 0.2em auto;
 }
 
+footer p,
 footer a {
-  color: black;
+  color: var(--color-accent-light);
 }
 
 .unauthenticated-app {
@@ -45,7 +56,7 @@ header {
 
 header>h1 {
   margin: 0;
-  color: #6f7852;
+  color: var(--color-primary);
   font-weight: normal;
 }
 
@@ -53,10 +64,16 @@ header>p {
   margin-top: 0.2em;
 }
 
+body>nav {
+  height: 2em;
+  width: 100%;
+  background-color: var(--color-accent-dark);
+}
+
 .sign-in-button {
   display: block;
-  color: #fefae0;
-  background-color: #6f7852;
+  color: var(--color-background);
+  background-color: var(--color-primary);
   padding: 0.7em;
   margin: auto;
   border-radius: 5px;

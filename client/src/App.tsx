@@ -7,6 +7,7 @@ import { useEffect } from 'react';
 function App() {
   return (
     <AuthProvider>
+      <ProfileBar />
       <AppHeader />
       <AppContent />
       <AppFooter />
@@ -36,7 +37,7 @@ function AppContent() {
 
 function AppFooter() {
   return (
-    <footer className="bound-width">
+    <footer>
       <p>&copy; <a href="https://twitter.com/mleone5244">Mario Leone</a></p>
       <p>Money icon by <a href="https://icons8.com">Icons8</a></p>
     </footer>
@@ -66,6 +67,13 @@ function UnauthenticatedApp() {
       <p>Please sign in to continue:</p>
       <SignInButton />
     </section>
+  )
+}
+
+function ProfileBar() {
+  return (
+    <nav>
+    </nav>
   )
 }
 
