@@ -54,9 +54,9 @@ function SignInButton() {
 
 function AuthenticatedApp() {
   return (
-    <div>
+    <p>
       Welcome known user!
-    </div>
+    </p>
   )
 }
 
