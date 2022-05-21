@@ -50,6 +50,15 @@ header>p {
   margin-top: 0.2em;
 }
 
+.sign-in-button {
+  color: #fefae0;
+  background-color: #6f7852;
+  padding: 0.7em;
+  border-radius: 5px;
+  border-width: 0px;
+  text-decoration: none;
+}
+
 @media only screen and (max-device-width: 667px) {
   #root {
     width: 90%;
