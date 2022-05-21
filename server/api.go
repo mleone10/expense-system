@@ -75,9 +75,8 @@ func NewServer(c Config) (Server, error) {
 				})
 			})
 
-			r.Route("/users", func(r chi.Router) {
-				r.Route("/{userID}", func(r chi.Router) {
-				})
+			r.Route("/user", func(r chi.Router) {
+				r.Get("/", s.handleGetUser())
 			})
 		})
 	})
@@ -206,6 +205,30 @@ func (s Server) handleUpdateOrg() http.HandlerFunc {
 func (s Server) handleDeleteOrg() http.HandlerFunc {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 
+	})
+}
+
+func (s Server) handleGetUser() http.HandlerFunc {
+	type response struct {
+		Name       string `json:"name"`
+		ProfileUrl string `json:"profileUrl"`
+	}
+
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		authCookie, err := r.Cookie(cookieNameAuthToken)
+		if err != nil {
+			s.error(w, r, fmt.Errorf("failed to get auth cookie from request: %w", err))
+		}
+
+		userInfo, err := s.auth.GetUserInfo(authCookie.Value)
+		if err != nil {
+			s.error(w, r, fmt.Errorf("failed to get user info from identity provider: %w", err))
+		}
+
+		s.writeResponse(w, response{
+			Name:       userInfo.Name,
+			ProfileUrl: userInfo.ProfileUrl,
+		})
 	})
 }
 
