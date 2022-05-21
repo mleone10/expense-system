@@ -15,7 +15,7 @@ body {
   width: 90vw;
 }
 
-.app-content {
+main {
   flex: 1;
 }
 
@@ -31,34 +31,23 @@ footer>p {
   margin: 0.2em auto;
 }
 
+.unauthenticated-app {
+  text-align: center;
+}
+
 header {
-  display: flex;
   justify-content: space-between;
   margin-top: 1em;
 }
 
-.header-block {
-  display: flex;
-  flex-direction: column;
-}
-
-.header-title {
+header>h1 {
   margin: 0;
   color: #6f7852;
   font-weight: normal;
 }
 
-.header-subtitle {
+header>p {
   margin-top: 0.2em;
-}
-
-.header-button {
-  color: #fefae0;
-  background-color: #6f7852;
-  padding: 0.7em;
-  border-radius: 5px;
-  border-width: 0px;
-  text-decoration: none;
 }
 
 @media only screen and (max-device-width: 667px) {
@@ -70,11 +59,7 @@ header {
     min-width: unset;
   }
 
-  .header {
-    flex-direction: column;
-  }
-
-  .header-block {
+  header {
     text-align: center;
   }
 }

@@ -17,27 +17,20 @@ function App() {
 function AppHeader() {
   return (
     <header className="bound-width">
-      <div className="header-block">
-        <h1 className="header-title">Expense System</h1>
-        <p className="header-subtitle">
-          Reimbursement simplified.
-        </p>
-      </div>
-      <div className="header-block">
-        {useAuth().getIsSignedIn() ? <SignOutButton /> : <SignInButton />}
-      </div>
+      <h1>Expense System</h1>
+      <p>Reimbursement simplified.</p>
     </header>
   )
 }
 
 function AppContent() {
   return (
-    <div className="app-content bound-width">
+    <main className=" bound-width">
       <Routes>
         <Route path="/" element={useAuth().getIsSignedIn() ? <AuthenticatedApp /> : <UnauthenticatedApp />} />
         <Route path="/auth/callback" element={<AuthCallback />} />
       </Routes>
-    </div>
+    </main>
   )
 }
 
@@ -59,14 +52,6 @@ function SignInButton() {
   )
 }
 
-function SignOutButton() {
-  return (
-    <button className="header-button" onClick={useAuth().signOut}>
-      Sign Out
-    </button>
-  )
-}
-
 function AuthenticatedApp() {
   return (
     <div>
@@ -77,9 +62,10 @@ function AuthenticatedApp() {
 
 function UnauthenticatedApp() {
   return (
-    <div>
-      Welcome stranger!
-    </div>
+    <section className="unauthenticated-app">
+      <p>Please sign in to continue using the Expense System:</p>
+      <SignInButton />
+    </section>
   )
 }
 
