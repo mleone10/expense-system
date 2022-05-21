@@ -113,3 +113,43 @@ func (a *authClient) TokenIsValid(rawToken string) (accessToken, error) {
 func (t accessToken) UserId() string {
 	return t.validatedToken.Subject()
 }
+
+type UserInfo struct {
+	Name       string
+	ProfileUrl string
+}
+
+func (a *authClient) GetUserInfo(authToken string) (UserInfo, error) {
+	type userInfoResponse struct {
+		Name       string `json:"name"`
+		ProfileUrl string `json:"picture"`
+	}
+
+	req, err := http.NewRequest("GET", "https://auth.expense.mleone.dev/oauth2/userInfo", nil)
+	if err != nil {
+		return UserInfo{}, fmt.Errorf("failed to construct user info request: %w", err)
+	}
+
+	req.Header.Add("Authorization", fmt.Sprintf("Bearer %s", authToken))
+
+	res, err := a.client.Do(req)
+	if err != nil {
+		return UserInfo{}, fmt.Errorf("request to user info endpoint failed: %w", err)
+	}
+	if res.StatusCode != http.StatusOK {
+		defer res.Body.Close()
+		body, _ := ioutil.ReadAll(res.Body)
+		return UserInfo{}, fmt.Errorf("received non-OK response from user info endpoint: %v (%v)", res.Status, string(body))
+	}
+
+	defer res.Body.Close()
+	bodyBytes, err := io.ReadAll(res.Body)
+	if err != nil {
+		return UserInfo{}, fmt.Errorf("failed to read user info response body: %w", err)
+	}
+
+	var userInfo userInfoResponse
+	json.Unmarshal(bodyBytes, &userInfo)
+
+	return UserInfo{Name: userInfo.Name, ProfileUrl: userInfo.ProfileUrl}, nil
+}
