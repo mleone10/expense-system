@@ -11,8 +11,7 @@ body {
 }
 
 .bound-width {
-  max-width: 900px;
-  width: 90vw;
+  width: 90%;
 }
 
 main {
@@ -38,6 +37,7 @@ footer>p {
 header {
   justify-content: space-between;
   margin-top: 1em;
+  text-align: center;
 }
 
 header>h1 {
@@ -51,24 +51,26 @@ header>p {
 }
 
 .sign-in-button {
+  display: block;
   color: #fefae0;
   background-color: #6f7852;
   padding: 0.7em;
+  margin: auto;
   border-radius: 5px;
-  border-width: 0px;
   text-decoration: none;
 }
 
-@media only screen and (max-device-width: 667px) {
-  #root {
-    width: 90%;
-  }
-
-  .app {
-    min-width: unset;
-  }
-
+@media only screen and (min-device-width: 667px) {
   header {
-    text-align: center;
+    text-align: left;
+  }
+
+  .bound-width {
+    max-width: 900px;
+    width: 90vw;
+  }
+
+  a.sign-in-button {
+    width: 15em;
   }
 }

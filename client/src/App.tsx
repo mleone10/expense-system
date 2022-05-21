@@ -63,7 +63,7 @@ function AuthenticatedApp() {
 function UnauthenticatedApp() {
   return (
     <section className="unauthenticated-app">
-      <p>Please sign in to continue using the Expense System:</p>
+      <p>Please sign in to continue:</p>
       <SignInButton />
     </section>
   )
