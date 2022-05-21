@@ -6,19 +6,17 @@ import { useEffect } from 'react';
 
 function App() {
   return (
-    <div className="app">
-      <AuthProvider>
-        <AppHeader />
-        <AppContent />
-        <AppFooter />
-      </AuthProvider>
-    </div>
+    <AuthProvider>
+      <AppHeader />
+      <AppContent />
+      <AppFooter />
+    </AuthProvider>
   );
 }
 
 function AppHeader() {
   return (
-    <header className="header">
+    <header className="bound-width">
       <div className="header-block">
         <h1 className="header-title">Expense System</h1>
         <p className="header-subtitle">
@@ -34,7 +32,7 @@ function AppHeader() {
 
 function AppContent() {
   return (
-    <div className="app-content">
+    <div className="app-content bound-width">
       <Routes>
         <Route path="/" element={useAuth().getIsSignedIn() ? <AuthenticatedApp /> : <UnauthenticatedApp />} />
         <Route path="/auth/callback" element={<AuthCallback />} />
@@ -45,7 +43,7 @@ function AppContent() {
 
 function AppFooter() {
   return (
-    <footer className="app-footer">
+    <footer className="bound-width">
       <p>Copyright &copy; 2021 <a href="https://twitter.com/mleone5244">Mario Leone</a></p>
       <p>Money icon by <a href="https://icons8.com">Icons8</a></p>
     </footer>

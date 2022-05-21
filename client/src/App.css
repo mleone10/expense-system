@@ -1,36 +1,37 @@
 @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@500&display=swap');
 
 body {
-  /* background-color: #283618; */
   background-color: #fefae0;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
   font-family: 'Roboto', sans-serif;
+  min-height: 100vh;
 }
 
-.app {
+.bound-width {
   max-width: 900px;
   width: 90vw;
-  display: flex;
-  flex-direction: column;
-  min-height: 100vh;
 }
 
 .app-content {
   flex: 1;
 }
 
-.app-footer {
+footer {
   margin-bottom: 1em;
+  flex-direction: column;
   text-align: center;
   opacity: 0.65;
   font-size: 0.75em;
-  line-height: 0.6em;
 }
 
-.header {
+footer>p {
+  margin: 0.2em auto;
+}
+
+header {
   display: flex;
   justify-content: space-between;
   margin-top: 1em;
