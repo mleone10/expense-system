@@ -65,9 +65,17 @@ header>p {
 }
 
 body>nav {
-  height: 2em;
+  height: 3em;
   width: 100%;
   background-color: var(--color-accent-dark);
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+}
+
+body>nav>img {
+  /* height: 75%; */
+  border-radius: 50%;
 }
 
 .sign-in-button {

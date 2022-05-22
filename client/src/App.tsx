@@ -2,7 +2,7 @@ import { Routes, Route, Navigate } from 'react-router';
 import { AuthProvider, useAuth } from './AuthContext';
 
 import './App.css';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 
 function App() {
   return (
@@ -71,9 +71,39 @@ function UnauthenticatedApp() {
 }
 
 function ProfileBar() {
+  interface userInfoType {
+    name: string;
+    profileUrl: string;
+  }
+
+  const [userInfo, setUserInfo] = useState<userInfoType | undefined>(undefined)
+  const isSignedIn = useAuth().getIsSignedIn();
+
+  useEffect(() => {
+    if (!isSignedIn) {
+      return
+    }
+
+    fetch(`/api/user`, {
+      credentials: "include"
+    }).then(response => {
+      if (response.ok) {
+        return response.json().then(res => res as userInfoType)
+      }
+    }).then(data => {
+      setUserInfo(data)
+    })
+  }, [isSignedIn])
+
+  if (userInfo == undefined) {
+    return <nav></nav>
+  }
+
   return (
     <nav>
-    </nav>
+      <span>{userInfo.name}</span>
+      <img src={userInfo.profileUrl} />
+    </nav >
   )
 }
 
