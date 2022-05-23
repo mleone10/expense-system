@@ -2,11 +2,12 @@ import { Routes, Route, Navigate } from 'react-router';
 import { AuthProvider, useAuth } from './AuthContext';
 
 import './App.css';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 
 function App() {
   return (
     <AuthProvider>
+      <ProfileBar />
       <AppHeader />
       <AppContent />
       <AppFooter />
@@ -36,7 +37,7 @@ function AppContent() {
 
 function AppFooter() {
   return (
-    <footer className="bound-width">
+    <footer>
       <p>&copy; <a href="https://twitter.com/mleone5244">Mario Leone</a></p>
       <p>Money icon by <a href="https://icons8.com">Icons8</a></p>
     </footer>
@@ -63,9 +64,54 @@ function AuthenticatedApp() {
 function UnauthenticatedApp() {
   return (
     <section className="unauthenticated-app">
-      <p>Please sign in to continue:</p>
-      <SignInButton />
+      <p>Please sign in to continue.</p>
     </section>
+  )
+}
+
+function ProfileBar() {
+  interface userInfoType {
+    name: string;
+    profileUrl: string;
+  }
+
+  const [userInfo, setUserInfo] = useState<userInfoType | undefined>(undefined)
+  const isSignedIn = useAuth().getIsSignedIn();
+
+  useEffect(() => {
+    if (!isSignedIn) {
+      return
+    }
+
+    fetch(`/api/user`, {
+      credentials: "include"
+    }).then(response => {
+      if (response.ok) {
+        return response.json().then(res => res as userInfoType)
+      }
+    }).then(data => {
+      setUserInfo(data)
+    })
+  }, [isSignedIn])
+
+  if (userInfo == undefined) {
+    return (
+      <nav>
+        <SignInButton />
+      </nav>
+    )
+  }
+
+  return (
+    <nav>
+      <span>{userInfo.name}</span>
+      <div className='dropdown-selector'>
+        <img src={userInfo.profileUrl} />
+        <div className='dropdown-content'>
+          <a href="/"><p>Sign Out</p></a>
+        </div>
+      </div>
+    </nav >
   )
 }
 
