@@ -105,7 +105,12 @@ function ProfileBar() {
   return (
     <nav>
       <span>{userInfo.name}</span>
-      <img src={userInfo.profileUrl} />
+      <div>
+        <img src={userInfo.profileUrl} />
+        <div className='dropdown-content'>
+          <a href="#"><p>Sign Out</p></a>
+        </div>
+      </div>
     </nav >
   )
 }
