@@ -80,18 +80,29 @@ body>nav>span {
   color: var(--color-accent-light)
 }
 
-body>nav img,
-body>nav>div {
+body>nav>div,
+body>nav>div img {
+  display: block;
   height: 100%;
   border-radius: 50%;
 }
 
+body>nav>div.dropdown-selector {
+  position: relative;
+  display: inline-block;
+}
+
 body>nav .dropdown-content {
+  display: none;
   position: absolute;
   right: 0px;
   min-width: 8em;
   background: var(--color-accent-light);
   box-shadow: -0.2em 0.2em 10px 0px rgba(0, 0, 0, 0.2);
+}
+
+body>nav .dropdown-selector:hover .dropdown-content {
+  display: block;
 }
 
 body>nav .dropdown-content p {
@@ -124,6 +135,7 @@ body>nav .dropdown-content a {
   }
 
   a.sign-in-button {
-    width: 15em;
+    width: 5em;
+    text-align: center;
   }
 }
