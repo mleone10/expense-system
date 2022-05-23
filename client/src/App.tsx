@@ -64,8 +64,7 @@ function AuthenticatedApp() {
 function UnauthenticatedApp() {
   return (
     <section className="unauthenticated-app">
-      <p>Please sign in to continue:</p>
-      <SignInButton />
+      <p>Please sign in to continue.</p>
     </section>
   )
 }
@@ -96,7 +95,11 @@ function ProfileBar() {
   }, [isSignedIn])
 
   if (userInfo == undefined) {
-    return <nav></nav>
+    return (
+      <nav>
+        <SignInButton />
+      </nav>
+    )
   }
 
   return (

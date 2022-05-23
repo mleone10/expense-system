@@ -65,25 +65,31 @@ header>p {
 }
 
 body>nav {
-  height: 3em;
   width: 100%;
+  height: 3.25em;
+  padding: 0.5em;
+  box-sizing: border-box;
   background-color: var(--color-accent-dark);
   display: flex;
   justify-content: flex-end;
   align-items: center;
 }
 
+body>nav>span {
+  margin: 0.5em;
+  color: var(--color-accent-light)
+}
+
 body>nav>img {
-  /* height: 75%; */
+  height: 100%;
   border-radius: 50%;
 }
 
 .sign-in-button {
   display: block;
+  padding: 0.6em;
   color: var(--color-background);
   background-color: var(--color-primary);
-  padding: 0.7em;
-  margin: auto;
   border-radius: 5px;
   text-decoration: none;
 }
