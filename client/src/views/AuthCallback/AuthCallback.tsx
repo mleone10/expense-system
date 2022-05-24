@@ -18,7 +18,7 @@ function AuthCallback() {
   }, [code, signIn])
 
   if (auth.getIsSignedIn()) {
-    return <Navigate to="/" />
+    return <Navigate to="/home" />
   } else {
     return <p>Signing you in...</p>
   }

@@ -1,6 +1,8 @@
-import { AuthProvider, useAuth } from "./AuthContext/AuthContext";
+import { AuthProvider, useAuth } from "./AuthContext";
+import { ProtectedRoute } from "./ProtectedRoute";
 
 export {
   AuthProvider,
-  useAuth
+  useAuth,
+  ProtectedRoute
 }
