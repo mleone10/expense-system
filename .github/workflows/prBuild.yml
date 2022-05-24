@@ -1,0 +1,52 @@
+name: Deploy expense system to aws
+
+on: [push, pull_request]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout code
+        uses: actions/checkout@v2
+      - name: install node
+        uses: actions/setup-node@v2
+        with:
+          node-version: 12
+          cache: npm
+          cache-dependency-path: client/package-lock.json
+      - name: install node packages
+        working-directory: client
+        run: npm install
+      - name: build client
+        working-directory: client
+        run: npm run build
+      - name: install go
+        uses: actions/setup-go@v1
+        with:
+          go-version: 1.17.x
+      - name: build lambda artifact
+        working-directory: server
+        run: |
+          make test
+      - name: set up terraform
+        uses: hashicorp/setup-terraform@v1
+        with:
+          terraform_wrapper: false
+      - name: configure aws credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
+      - name: lint terraform config
+        run: terraform -chdir=infra fmt -check
+      - name: set up terraform environment
+        run: terraform -chdir=infra init
+      - name: validate terraform config
+        run: terraform -chdir=infra validate -no-color
+      - name: plan terraform infrastructure
+        run: |
+          terraform -chdir=infra plan -no-color -input=false \
+            -var google_oauth_client_id=${{ secrets.GOOGLE_OAUTH_CLIENT_ID }} \
+            -var google_oauth_client_secret=${{ secrets.GOOGLE_OAUTH_CLIENT_SECRET }} \
+            -var cognito_client_secret=${{ secrets.COGNITO_CLIENT_SECRET }}
