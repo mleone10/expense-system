@@ -85,6 +85,10 @@ resource "aws_cognito_user_pool_client" "client" {
 # * Create a CloudFront distribution that can be accessed via our chosen domain
 resource "aws_s3_bucket" "bucket" {
   bucket = "leone-${var.project_name}"
+}
+
+resource "aws_s3_bucket_acl" "bucket_acl" {
+  bucket = aws_s3_bucket.bucket.id
   acl    = "private"
 }
 
