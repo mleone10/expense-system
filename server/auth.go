@@ -23,9 +23,7 @@ type authClient struct {
 }
 
 type authTokens struct {
-	idToken      string
-	accessToken  string
-	refreshToken string
+	accessToken string
 }
 
 type authClientConfig interface {
@@ -151,5 +149,5 @@ func (a *authClient) GetUserInfo(authToken string) (UserInfo, error) {
 	var userInfo userInfoResponse
 	json.Unmarshal(bodyBytes, &userInfo)
 
-	return UserInfo{Name: userInfo.Name, ProfileUrl: userInfo.ProfileUrl}, nil
+	return UserInfo(userInfo), nil
 }

@@ -16,7 +16,7 @@ import (
 type Server struct {
 	auth   *authClient
 	router chi.Router
-	logger log.Logger
+	logger *log.Logger
 	orgs   orgRepo
 }
 
@@ -46,7 +46,7 @@ func NewServer(c Config) (Server, error) {
 	s := Server{
 		auth:   authClient,
 		router: chi.NewRouter(),
-		logger: *log.New(os.Stderr, "", log.LstdFlags),
+		logger: log.New(os.Stderr, "", log.LstdFlags),
 		orgs:   orgRepo,
 	}
 
@@ -188,9 +188,6 @@ func (s Server) handleCreateNewOrg() http.HandlerFunc {
 }
 
 func (s Server) handleGetOrg() http.HandlerFunc {
-	type response struct {
-	}
-
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 
 	})
@@ -225,10 +222,7 @@ func (s Server) handleGetUser() http.HandlerFunc {
 			s.error(w, r, fmt.Errorf("failed to get user info from identity provider: %w", err))
 		}
 
-		s.writeResponse(w, response{
-			Name:       userInfo.Name,
-			ProfileUrl: userInfo.ProfileUrl,
-		})
+		s.writeResponse(w, response(userInfo))
 	})
 }
 
