@@ -28,6 +28,7 @@ jobs:
         working-directory: server
         run: |
           make build
+          zip handler.zip ./bin/lambdaserver
       - name: set up terraform
         uses: hashicorp/setup-terraform@v1
         with:
