@@ -27,7 +27,7 @@ jobs:
       - name: build lambda artifact
         working-directory: server
         run: |
-          make test
+          make build
       - name: set up terraform
         uses: hashicorp/setup-terraform@v1
         with:
