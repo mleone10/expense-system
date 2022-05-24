@@ -1,4 +1,4 @@
-name: Deploy expense system to aws
+name: Build and test expense system
 
 on: [push, pull_request]
 
