@@ -1,7 +1,7 @@
 import { Routes, Route } from 'react-router';
 import { AuthProvider, ProtectedRoute } from 'hooks';
 import { ProfileBar, AppFooter, AppHeader } from "components";
-import { AuthCallback, UnauthenticatedApp } from 'views';
+import { AuthCallback, Home, UnauthenticatedApp } from 'views';
 
 import './App.css';
 
@@ -22,19 +22,11 @@ function AppContent() {
       <Routes>
         <Route index element={<UnauthenticatedApp />} />
         <Route element={<ProtectedRoute />}>
-          <Route path="/home" element={<AuthenticatedApp />} />
+          <Route path="/home" element={<Home />} />
         </Route>
         <Route path="/auth/callback" element={<AuthCallback />} />
       </Routes>
     </main>
-  )
-}
-
-function AuthenticatedApp() {
-  return (
-    <p>
-      Welcome known user!
-    </p>
   )
 }
 
