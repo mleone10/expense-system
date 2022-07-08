@@ -1,14 +1,23 @@
 import { Routes, Route } from 'react-router';
 import { AuthProvider, ProtectedRoute } from 'hooks';
-import { ProfileBar, AppFooter, AppHeader } from "components";
+import { ProfileBar, MainMenu, AppFooter, AppHeader } from "components";
 import { AuthCallback, Home, UnauthenticatedApp } from 'views';
 
 import './App.css';
+import { useState } from 'react';
 
 function App() {
+  const [isMainMenuVisible, setIsMainMenuVisible] = useState(false)
+
+  function showMainMenu() {
+    setIsMainMenuVisible(true)
+    console.log("clicked")
+  }
+
   return (
     <AuthProvider>
-      <ProfileBar />
+      <ProfileBar showMainMenu={showMainMenu} />
+      <MainMenu isMainMenuVisible={isMainMenuVisible} />
       <AppHeader />
       <AppContent />
       <AppFooter />

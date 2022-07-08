@@ -4,7 +4,11 @@ import { useAuth } from "hooks"
 
 import "./ProfileBar.css"
 
-function ProfileBar() {
+interface Props {
+  showMainMenu(): void
+}
+
+const ProfileBar = ({ showMainMenu }: Props) => {
   interface userInfoType {
     name: string;
     profileUrl: string;
@@ -39,7 +43,11 @@ function ProfileBar() {
 
   return (
     <nav className="authenticated-nav">
-      <svg className='main-menu-selector' xmlns="http://www.w3.org/2000/svg" viewBox="0 0 50 50">
+      <svg
+        className='main-menu-selector'
+        xmlns="http://www.w3.org/2000/svg"
+        viewBox="0 0 50 50"
+        onClick={showMainMenu}>
         <path d="M 0 7.5 L 0 12.5 L 50 12.5 L 50 7.5 Z M 0 22.5 L 0 27.5 L 50 27.5 L 50 22.5 Z M 0 37.5 L 0 42.5 L 50 42.5 L 50 37.5 Z"></path>
       </svg>
       <span className="right-side">
