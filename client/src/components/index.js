@@ -1,13 +1,11 @@
-import ProfileBar from "./ProfileBar/ProfileBar";
+import AppHeader from "./AppHeader/AppHeader";
 import MainMenu from "./MainMenu/MainMenu";
 import SignInButton from "./SignInButton/SignInButton";
 import AppFooter from "./AppFooter/AppFooter";
-import AppHeader from "./AppHeader/AppHeader";
 
 export {
-  ProfileBar,
+  AppHeader,
   MainMenu,
   SignInButton,
-  AppFooter,
-  AppHeader
+  AppFooter
 }

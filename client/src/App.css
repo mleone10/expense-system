@@ -11,13 +11,13 @@ html {
   background-color: var(--color-background);
   display: flex;
   flex-direction: column;
-  justify-content: center;
-  align-items: center;
   font-family: 'Roboto', sans-serif;
   min-height: 100vh;
 }
 
 .bound-width {
+  margin-left: auto;
+  margin-right: auto;
   width: 90%;
 }
 
