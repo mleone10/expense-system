@@ -1,4 +1,5 @@
 import { useEffect, useRef } from "react"
+import { Link } from "react-router-dom"
 import "./MainMenu.css"
 
 interface Props {
@@ -30,11 +31,10 @@ const MainMenu = ({ isMainMenuVisible, clearMainMenu }: Props) => {
   return (
     <nav className={classes} ref={ref}>
       <ul>
-        <li>Foo</li>
-        <li>Bar</li>
-        <li>Fizz</li>
-        <li>Buzz</li>
-        <li>VeryLongMainMenuItem</li>
+        <li>Home</li>
+        <li>Expenses</li>
+        <li>Organizations</li>
+        <Link reloadDocument to="/"><li>Sign Out</li></Link>
       </ul>
     </nav >
   )

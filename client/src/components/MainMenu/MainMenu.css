@@ -17,9 +17,23 @@ nav.main-menu ul {
 }
 
 nav.main-menu li {
+  position: relative;
   padding: 1.5rem 2rem;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+nav.main-menu li:last-child:after {
+  border-style: none;
 }
 
 nav.main-menu li:hover {
   background-color: rgba(0, 0, 0, 0.05);
+}
+
+nav.main-menu a {
+  text-decoration: none;
+  color: var(--color-accent-dark);
+  /* display: block;
+  width: 100%;
+  height: 100%; */
 }
