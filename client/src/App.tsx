@@ -11,13 +11,16 @@ function App() {
 
   function showMainMenu() {
     setIsMainMenuVisible(true)
-    console.log("clicked")
+  }
+
+  function clearMainMenu() {
+    setIsMainMenuVisible(false)
   }
 
   return (
     <AuthProvider>
       <AppHeader showMainMenu={showMainMenu} />
-      <MainMenu isMainMenuVisible={isMainMenuVisible} />
+      <MainMenu isMainMenuVisible={isMainMenuVisible} clearMainMenu={clearMainMenu} />
       <AppContent />
       <AppFooter />
     </AuthProvider>

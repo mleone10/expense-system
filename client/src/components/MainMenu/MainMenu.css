@@ -1,0 +1,25 @@
+nav.main-menu {
+  display: none;
+}
+
+nav.main-menu.visible {
+  display: block;
+  position: absolute;
+  background-color: var(--color-accent-light);
+  box-shadow: -0.2em 0.2em 10px 0px rgba(0, 0, 0, 0.2);
+}
+
+nav.main-menu ul {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+  min-width: 18rem;
+}
+
+nav.main-menu li {
+  padding: 1.5rem 2rem;
+}
+
+nav.main-menu li:hover {
+  background-color: rgba(0, 0, 0, 0.05);
+}
