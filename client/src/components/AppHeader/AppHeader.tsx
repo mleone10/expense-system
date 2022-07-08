@@ -34,13 +34,13 @@ const AppHeader = ({ showMainMenu }: Props) => {
   }, [isSignedIn])
 
   const unauthenticatedProfileBar = (
-    <nav className="unauthenticated-nav">
+    <nav className="profile-bar unauthenticated-profile-bar">
       <SignInButton />
     </nav>
   )
 
   const authenticatedProfileBar = (
-    <nav className="authenticated-nav">
+    <nav className="profile-bar authenticated-profile-bar">
       <svg
         className='main-menu-selector'
         xmlns="http://www.w3.org/2000/svg"
