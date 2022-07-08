@@ -1,4 +1,5 @@
-import { useEffect, useRef } from "react"
+import { useAuth } from "hooks"
+import React, { useEffect, useRef } from "react"
 import { Link } from "react-router-dom"
 import "./MainMenu.css"
 
@@ -8,6 +9,7 @@ interface Props {
 }
 
 const MainMenu = ({ isMainMenuVisible, clearMainMenu }: Props) => {
+  const auth = useAuth();
   const ref = useRef<HTMLElement>(null)
 
   useEffect(() => {
@@ -28,7 +30,7 @@ const MainMenu = ({ isMainMenuVisible, clearMainMenu }: Props) => {
     isMainMenuVisible && "visible"
   ].filter(e => e).join(" ")
 
-  return (
+  return auth.isSignedIn ? (
     <nav className={classes} ref={ref}>
       <ul>
         <li>Home</li>
@@ -37,7 +39,7 @@ const MainMenu = ({ isMainMenuVisible, clearMainMenu }: Props) => {
         <Link reloadDocument to="/"><li>Sign Out</li></Link>
       </ul>
     </nav >
-  )
+  ) : (<React.Fragment></React.Fragment>)
 }
 
 export default MainMenu;

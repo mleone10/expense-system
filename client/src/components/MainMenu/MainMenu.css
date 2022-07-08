@@ -1,19 +1,24 @@
+html {
+  --main-menu-width: 18rem;
+}
+
 nav.main-menu {
   display: none;
+  position: absolute;
+  height: 100%;
+  background-color: var(--color-accent-light);
+  box-shadow: -0.2em 0.2em 10px 0px rgba(0, 0, 0, 0.2);
 }
 
 nav.main-menu.visible {
   display: block;
-  position: absolute;
-  background-color: var(--color-accent-light);
-  box-shadow: -0.2em 0.2em 10px 0px rgba(0, 0, 0, 0.2);
 }
 
 nav.main-menu ul {
   list-style-type: none;
   padding: 0;
   margin: 0;
-  min-width: 18rem;
+  width: var(--main-menu-width);
 }
 
 nav.main-menu li {
@@ -23,7 +28,7 @@ nav.main-menu li {
   color: var(--color-accent-dark);
 }
 
-nav.main-menu li:last-child:after {
+nav.main-menu li:last-child {
   border-style: none;
 }
 
@@ -33,4 +38,10 @@ nav.main-menu li:hover {
 
 nav.main-menu a {
   text-decoration: none;
+}
+
+@media only screen and (min-device-width: 667px) {
+  nav.main-menu {
+    display: block;
+  }
 }

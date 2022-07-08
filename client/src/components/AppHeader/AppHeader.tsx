@@ -14,11 +14,11 @@ const AppHeader = ({ showMainMenu }: Props) => {
     profileUrl: string;
   }
 
+  const auth = useAuth();
   const [userInfo, setUserInfo] = useState<userInfoType | undefined>(undefined)
-  const isSignedIn = useAuth().getIsSignedIn();
 
   useEffect(() => {
-    if (!isSignedIn) {
+    if (!auth.isSignedIn) {
       return
     }
 
@@ -31,7 +31,7 @@ const AppHeader = ({ showMainMenu }: Props) => {
     }).then(data => {
       setUserInfo(data)
     })
-  }, [isSignedIn])
+  }, [auth.isSignedIn])
 
   const unauthenticatedProfileBar = (
     <nav className="profile-bar unauthenticated-profile-bar">
