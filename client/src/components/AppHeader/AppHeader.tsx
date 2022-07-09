@@ -50,12 +50,7 @@ const AppHeader = ({ showMainMenu }: Props) => {
       </svg>
       <span className="right-side">
         <span className="username">{userInfo?.name}</span>
-        <div className='dropdown-selector'>
-          <img src={userInfo?.profileUrl} alt="Current user" />
-          <div className='dropdown-content'>
-            <a href="/"><p>Sign Out</p></a>
-          </div>
-        </div>
+        <img src={userInfo?.profileUrl} alt="Current user" />
       </span>
     </nav >
   )

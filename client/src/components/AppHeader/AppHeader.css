@@ -50,37 +50,8 @@ header>p {
   color: var(--color-accent-light)
 }
 
-.profile-bar .dropdown-selector,
-.profile-bar .dropdown-selector img {
+.profile-bar img {
   display: block;
   height: 100%;
   border-radius: 50%;
-}
-
-.profile-bar .dropdown-selector {
-  position: relative;
-  display: inline-block;
-}
-
-.profile-bar .dropdown-content {
-  display: none;
-  position: absolute;
-  right: 0px;
-  min-width: 8em;
-  background: var(--color-accent-light);
-  box-shadow: -0.2em 0.2em 10px 0px rgba(0, 0, 0, 0.2);
-}
-
-.profile-bar .dropdown-selector:hover .dropdown-content {
-  display: block;
-}
-
-.profile-bar .dropdown-content p {
-  margin: 0;
-  padding: 1em 0.5em;
-  color: black;
-}
-
-.profile-bar .dropdown-content a {
-  text-decoration: none;
 }
