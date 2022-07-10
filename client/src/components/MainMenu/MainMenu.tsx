@@ -33,9 +33,7 @@ const MainMenu = ({ isMainMenuVisible, clearMainMenu }: Props) => {
   return auth.isSignedIn ? (
     <nav className={classes} ref={ref}>
       <ul>
-        <li>Home</li>
-        <li>Expenses</li>
-        <li>Organizations</li>
+        <Link to="/"><li>Home</li></Link>
         <Link reloadDocument to="/"><li>Sign Out</li></Link>
       </ul>
     </nav >
