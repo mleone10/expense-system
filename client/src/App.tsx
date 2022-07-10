@@ -1,6 +1,6 @@
 import { Routes, Route } from 'react-router';
 import { AuthProvider, ProtectedRoute } from 'hooks';
-import { AppHeader, MainMenu, AppFooter } from "components";
+import { ProfileBar, MainMenu, AppFooter } from "components";
 import { AuthCallback, Home, UnauthenticatedApp } from 'views';
 
 import './App.css';
@@ -19,7 +19,7 @@ function App() {
 
   return (
     <AuthProvider>
-      <AppHeader showMainMenu={showMainMenu} />
+      <ProfileBar showMainMenu={showMainMenu} />
       <MainMenu isMainMenuVisible={isMainMenuVisible} clearMainMenu={clearMainMenu} />
       <AppContent />
       <AppFooter />

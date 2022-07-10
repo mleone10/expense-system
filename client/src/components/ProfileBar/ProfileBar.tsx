@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { SignInButton } from "components"
 import { useAuth } from "hooks"
 
-import "./AppHeader.css"
+import "./ProfileBar.css"
 
 interface Props {
   showMainMenu(): void
@@ -12,7 +12,7 @@ interface Props {
 // TODO: Separate main page content into MainMenu and PageContent so that both are visible simultaneously on large screens
 // TODO: Configure mobile experience such that MainMenu appears on top of PageContent on mobile
 // TODO: Configure MainMenu icon to disappear on larger screens so that MainMenu is always visible
-const AppHeader = ({ showMainMenu }: Props) => {
+const ProfileBar = ({ showMainMenu }: Props) => {
   interface userInfoType {
     name: string;
     profileUrl: string;
@@ -38,13 +38,13 @@ const AppHeader = ({ showMainMenu }: Props) => {
   }, [auth.isSignedIn])
 
   const unauthenticatedProfileBar = (
-    <nav className="profile-bar unauthenticated-profile-bar">
+    <header className="profile-bar unauthenticated-profile-bar">
       <SignInButton />
-    </nav>
+    </header>
   )
 
   const authenticatedProfileBar = (
-    <nav className="profile-bar authenticated-profile-bar">
+    <header className="profile-bar authenticated-profile-bar">
       <svg
         className='main-menu-selector'
         xmlns="http://www.w3.org/2000/svg"
@@ -56,16 +56,12 @@ const AppHeader = ({ showMainMenu }: Props) => {
         <span className="username">{userInfo?.name}</span>
         <img src={userInfo?.profileUrl} alt="Current user" />
       </span>
-    </nav >
-  )
-
-  return (
-    <header>
-      {userInfo === undefined ?
-        unauthenticatedProfileBar :
-        authenticatedProfileBar}
     </header>
   )
+
+  return userInfo === undefined ?
+    unauthenticatedProfileBar :
+    authenticatedProfileBar
 }
 
-export default AppHeader;
+export default ProfileBar;
