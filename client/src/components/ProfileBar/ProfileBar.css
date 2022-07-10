@@ -1,50 +1,49 @@
-nav {
-  width: 100%;
+.profile-bar {
   height: 3.25em;
   padding: 0.5em;
   box-sizing: border-box;
-  background-color: var(--color-accent-dark);
+  background-color: var(--color-dark-green);
   display: flex;
-  justify-content: flex-end;
   align-items: center;
 }
 
-nav>span {
-  margin: 0.5em;
-  color: var(--color-accent-light)
+.profile-bar.unauthenticated-profile-bar {
+  justify-content: end;
 }
 
-nav>div,
-nav>div img {
+.profile-bar.authenticated-profile-bar {
+  justify-content: space-between;
+}
+
+.profile-bar .main-menu-selector {
+  height: 90%;
+  fill: var(--color-white);
+}
+
+.profile-bar>.right-side {
+  display: flex;
+  align-items: center;
+  height: 100%;
+}
+
+.profile-bar .username {
+  margin: 0.5em;
+  line-height: normal;
+  color: var(--color-white)
+}
+
+.profile-bar img {
   display: block;
   height: 100%;
   border-radius: 50%;
 }
 
-nav>div.dropdown-selector {
-  position: relative;
-  display: inline-block;
-}
+@media only screen and (min-device-width: 667px) {
+  .profile-bar.authenticated-profile-bar {
+    justify-content: end;
+  }
 
-nav .dropdown-content {
-  display: none;
-  position: absolute;
-  right: 0px;
-  min-width: 8em;
-  background: var(--color-accent-light);
-  box-shadow: -0.2em 0.2em 10px 0px rgba(0, 0, 0, 0.2);
-}
-
-nav .dropdown-selector:hover .dropdown-content {
-  display: block;
-}
-
-nav .dropdown-content p {
-  margin: 0;
-  padding: 1em 0.5em;
-  color: black;
-}
-
-nav .dropdown-content a {
-  text-decoration: none;
+  .profile-bar .main-menu-selector {
+    display: none;
+  }
 }

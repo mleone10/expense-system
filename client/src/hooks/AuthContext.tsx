@@ -1,33 +1,16 @@
-import { createContext, useContext, useState, useCallback, ReactNode } from 'react';
+import { createContext, useContext, useState, ReactNode } from 'react';
 
 interface AuthContextType {
-  getIsSignedIn: () => boolean;
-  signIn: () => void;
-  signOut: () => void;
+  isSignedIn: boolean;
+  setIsSignedIn(state: boolean): void;
 }
 
-const AuthContext = createContext<AuthContextType>(null!);
+const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 function AuthProvider({ children }: { children: ReactNode }) {
   let [isSignedIn, setIsSignedIn] = useState<boolean>(false);
 
-  let getIsSignedIn: () => boolean = useCallback(
-    () => {
-      return isSignedIn
-    }, [isSignedIn]
-  )
-
-  let signIn = useCallback(
-    () => {
-      setIsSignedIn(true);
-    }, []);
-
-  let signOut = useCallback(
-    () => {
-      setIsSignedIn(false);
-    }, []);
-
-  let value = { getIsSignedIn, signIn, signOut };
+  let value = { isSignedIn, setIsSignedIn };
 
   return (
     <AuthContext.Provider value={value}>
@@ -37,7 +20,12 @@ function AuthProvider({ children }: { children: ReactNode }) {
 }
 
 function useAuth() {
-  return useContext(AuthContext);
+  const authContext = useContext(AuthContext)
+  if (authContext === undefined) {
+    throw new Error("auth context is undefined")
+  }
+
+  return authContext
 }
 
 export { AuthProvider, useAuth };

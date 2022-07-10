@@ -1,41 +1,35 @@
 @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@500&display=swap');
 
 html {
-  --color-background: #fefae0;
-  --color-primary: #6f7852;
-  --color-accent-dark: #424634;
-  --color-accent-light: #f8f7f1;
+  /* https://coolors.co/ffffff-c5c9ba-6f7852-424634 */
+  --color-ash-gray: #C5C9BA;
+  --color-light-green: #6f7852;
+  --color-dark-green: #424634;
+  --color-white: #ffffff;
 }
 
 #root {
-  background-color: var(--color-background);
+  background-color: var(--color-white);
   display: flex;
   flex-direction: column;
-  justify-content: center;
-  align-items: center;
   font-family: 'Roboto', sans-serif;
   min-height: 100vh;
 }
 
-.bound-width {
-  width: 90%;
+main {
+  width: 100%;
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 0 2rem
 }
 
-main {
+.page-body {
+  display: flex;
   flex: 1;
 }
 
 
 @media only screen and (min-device-width: 667px) {
-  header {
-    text-align: left;
-  }
-
-  .bound-width {
-    max-width: 900px;
-    width: 90vw;
-  }
-
   a.sign-in-button {
     width: 5em;
     text-align: center;

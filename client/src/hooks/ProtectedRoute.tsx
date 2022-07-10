@@ -2,7 +2,7 @@ import { Navigate, Outlet } from "react-router";
 import { useAuth } from "hooks";
 
 export const ProtectedRoute = () => {
-  if (!useAuth().getIsSignedIn()) {
+  if (!useAuth().isSignedIn) {
     return <Navigate to="/" />
   }
 

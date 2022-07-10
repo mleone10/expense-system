@@ -1,8 +1,8 @@
 .sign-in-button {
   display: block;
   padding: 0.6em;
-  color: var(--color-background);
-  background-color: var(--color-primary);
+  color: var(--color-white);
+  background-color: var(--color-light-green);
   border-radius: 5px;
   text-decoration: none;
 }

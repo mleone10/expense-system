@@ -4,17 +4,21 @@ import { useAuth } from "hooks"
 
 import "./ProfileBar.css"
 
-function ProfileBar() {
+interface Props {
+  showMainMenu(): void
+}
+
+const ProfileBar = ({ showMainMenu }: Props) => {
   interface userInfoType {
     name: string;
     profileUrl: string;
   }
 
+  const auth = useAuth();
   const [userInfo, setUserInfo] = useState<userInfoType | undefined>(undefined)
-  const isSignedIn = useAuth().getIsSignedIn();
 
   useEffect(() => {
-    if (!isSignedIn) {
+    if (!auth.isSignedIn) {
       return
     }
 
@@ -27,27 +31,33 @@ function ProfileBar() {
     }).then(data => {
       setUserInfo(data)
     })
-  }, [isSignedIn])
+  }, [auth.isSignedIn])
 
-  if (userInfo === undefined) {
-    return (
-      <nav>
-        <SignInButton />
-      </nav>
-    )
-  }
-
-  return (
-    <nav>
-      <span>{userInfo.name}</span>
-      <div className='dropdown-selector'>
-        <img src={userInfo.profileUrl} alt="Current user" />
-        <div className='dropdown-content'>
-          <a href="/"><p>Sign Out</p></a>
-        </div>
-      </div>
-    </nav >
+  const unauthenticatedProfileBar = (
+    <header className="profile-bar unauthenticated-profile-bar">
+      <SignInButton />
+    </header>
   )
+
+  const authenticatedProfileBar = (
+    <header className="profile-bar authenticated-profile-bar">
+      <svg
+        className='main-menu-selector'
+        xmlns="http://www.w3.org/2000/svg"
+        viewBox="0 0 50 50"
+        onClick={showMainMenu}>
+        <path d="M 0 7.5 L 0 12.5 L 50 12.5 L 50 7.5 Z M 0 22.5 L 0 27.5 L 50 27.5 L 50 22.5 Z M 0 37.5 L 0 42.5 L 50 42.5 L 50 37.5 Z"></path>
+      </svg>
+      <span className="right-side">
+        <span className="username">{userInfo?.name}</span>
+        <img src={userInfo?.profileUrl} alt="Current user" />
+      </span>
+    </header>
+  )
+
+  return userInfo === undefined ?
+    unauthenticatedProfileBar :
+    authenticatedProfileBar
 }
 
 export default ProfileBar;

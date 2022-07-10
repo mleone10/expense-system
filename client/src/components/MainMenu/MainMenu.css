@@ -1,0 +1,48 @@
+html {
+  --main-menu-width: 15rem;
+}
+
+nav.main-menu {
+  display: none;
+  position: absolute;
+  margin-bottom: 0.25rem;
+  background-color: var(--color-ash-gray);
+  box-shadow: 0.0em 0.0em 5px 0px rgba(0, 0, 0, 0.2);
+}
+
+nav.main-menu.visible {
+  display: block;
+}
+
+nav.main-menu ul {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+  width: var(--main-menu-width);
+}
+
+nav.main-menu li {
+  position: relative;
+  padding: 1.5rem 2rem;
+  color: black;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+nav.main-menu a:last-of-type li {
+  border-style: none;
+}
+
+nav.main-menu li:hover {
+  background-color: rgba(0, 0, 0, 0.05);
+}
+
+nav.main-menu a {
+  text-decoration: none;
+}
+
+@media only screen and (min-device-width: 667px) {
+  nav.main-menu {
+    display: block;
+    position: relative;
+  }
+}

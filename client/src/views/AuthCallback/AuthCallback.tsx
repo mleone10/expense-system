@@ -4,7 +4,6 @@ import { useAuth } from "hooks";
 
 function AuthCallback() {
   const auth = useAuth();
-  const signIn = auth.signIn;
   const code = new URLSearchParams(window.location.search).get("code");
 
   useEffect(() => {
@@ -12,12 +11,12 @@ function AuthCallback() {
       credentials: "include"
     }).then(response => {
       if (response.ok) {
-        signIn();
+        auth.setIsSignedIn(true);
       }
     })
-  }, [code, signIn])
+  }, [code, auth])
 
-  if (auth.getIsSignedIn()) {
+  if (auth.isSignedIn) {
     return <Navigate to="/home" />
   } else {
     return <p>Signing you in...</p>
