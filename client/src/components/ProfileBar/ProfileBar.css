@@ -2,7 +2,7 @@
   height: 3.25em;
   padding: 0.5em;
   box-sizing: border-box;
-  background-color: var(--color-accent-dark);
+  background-color: var(--color-dark-green);
   display: flex;
   align-items: center;
 }
@@ -17,7 +17,7 @@
 
 .profile-bar .main-menu-selector {
   height: 90%;
-  fill: var(--color-accent-light);
+  fill: var(--color-white);
 }
 
 .profile-bar>.right-side {
@@ -29,7 +29,7 @@
 .profile-bar .username {
   margin: 0.5em;
   line-height: normal;
-  color: var(--color-accent-light)
+  color: var(--color-white)
 }
 
 .profile-bar img {

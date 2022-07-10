@@ -1,6 +1,6 @@
 footer {
-  background-color: var(--color-accent-dark);
-  box-shadow: 0rem -0.25rem var(--color-primary);
+  background-color: var(--color-dark-green);
+  box-shadow: 0rem -0.25rem var(--color-light-green);
   width: 100%;
   padding: 0.5em 0;
   text-align: center;
@@ -14,5 +14,5 @@ footer>p {
 
 footer p,
 footer a {
-  color: var(--color-accent-light);
+  color: var(--color-white);
 }

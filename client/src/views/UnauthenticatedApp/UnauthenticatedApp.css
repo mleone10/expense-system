@@ -5,7 +5,7 @@
 .unauthenticated-app>h1 {
   margin-top: 1rem;
   margin-bottom: 0;
-  color: var(--color-primary);
+  color: var(--color-light-green);
   font-weight: normal;
 }
 
