@@ -8,9 +8,6 @@ interface Props {
   showMainMenu(): void
 }
 
-// TODO: Separate main page content into MainMenu and PageContent so that both are visible simultaneously on large screens
-// TODO: Configure mobile experience such that MainMenu appears on top of PageContent on mobile
-// TODO: Configure MainMenu icon to disappear on larger screens so that MainMenu is always visible
 const ProfileBar = ({ showMainMenu }: Props) => {
   interface userInfoType {
     name: string;

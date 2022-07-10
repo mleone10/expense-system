@@ -8,6 +8,8 @@ interface Props {
   clearMainMenu(): void
 }
 
+// TODO: Adjust drop shadow to be darker on desktop (better delineation between nav and content)
+// TODO: Adjust desktop shadow to not overlap footer shadow
 const MainMenu = ({ isMainMenuVisible, clearMainMenu }: Props) => {
   const auth = useAuth();
   const ref = useRef<HTMLElement>(null)
