@@ -7,7 +7,7 @@ nav.main-menu {
   position: absolute;
   margin-bottom: 0.25rem;
   background-color: var(--color-ash-gray);
-  box-shadow: -0.2em 0.2em 10px 0px rgba(0, 0, 0, 0.2);
+  box-shadow: 0.0em 0.0em 5px 0px rgba(0, 0, 0, 0.2);
 }
 
 nav.main-menu.visible {
