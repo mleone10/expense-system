@@ -8,7 +8,6 @@ interface Props {
   showMainMenu(): void
 }
 
-// TODO: Break ProfileBar and Header back into two components
 // TODO: Separate main page content into MainMenu and PageContent so that both are visible simultaneously on large screens
 // TODO: Configure mobile experience such that MainMenu appears on top of PageContent on mobile
 // TODO: Configure MainMenu icon to disappear on larger screens so that MainMenu is always visible

@@ -1,11 +1,11 @@
 html {
-  --main-menu-width: 18rem;
+  --main-menu-width: 15rem;
 }
 
 nav.main-menu {
   display: none;
   position: absolute;
-  height: 100%;
+  margin-bottom: 0.25rem;
   background-color: var(--color-accent-light);
   box-shadow: -0.2em 0.2em 10px 0px rgba(0, 0, 0, 0.2);
 }
@@ -43,5 +43,6 @@ nav.main-menu a {
 @media only screen and (min-device-width: 667px) {
   nav.main-menu {
     display: block;
+    position: relative;
   }
 }
