@@ -1,3 +1,28 @@
 .unauthenticated-app {
   text-align: center;
 }
+
+.unauthenticated-app>h1 {
+  margin-top: 1rem;
+  margin-bottom: 0;
+  color: var(--color-primary);
+  font-weight: normal;
+}
+
+.unauthenticated-app>h2 {
+  margin-top: 0.2rem;
+  font-weight: unset;
+  font-size: 1rem;
+}
+
+.unauthenticated-app>p {
+  margin-top: 2rem;
+}
+
+@media only screen and (min-device-width: 667px) {
+
+  .unauthenticated-app>h1,
+  .unauthenticated-app>h2 {
+    text-align: left;
+  }
+}
