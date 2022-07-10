@@ -24,11 +24,11 @@ nav.main-menu ul {
 nav.main-menu li {
   position: relative;
   padding: 1.5rem 2rem;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
   color: black;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
 }
 
-nav.main-menu li:last-child {
+nav.main-menu a:last-of-type li {
   border-style: none;
 }
 
