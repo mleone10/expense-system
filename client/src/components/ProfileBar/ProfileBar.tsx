@@ -1,5 +1,6 @@
 import { SignInButton } from "components"
 import { useAuth } from "hooks"
+import { useEffect, useState } from "react"
 
 import "./ProfileBar.css"
 
@@ -8,7 +9,24 @@ interface Props {
 }
 
 const ProfileBar = ({ showMainMenu }: Props) => {
+  const [profileImageUrl, setProfileImageUrl] = useState<string | undefined>();
   const auth = useAuth();
+
+  useEffect(() => {
+    if (auth.userInfo?.profileUrl !== undefined) {
+      fetch(auth.userInfo?.profileUrl)
+        .then(res => {
+          if (res.ok) {
+            return res.blob()
+          }
+        })
+        .then(blob => {
+          if (blob !== undefined) {
+            setProfileImageUrl(URL.createObjectURL(blob))
+          }
+        })
+    }
+  }, [auth.userInfo?.profileUrl])
 
   const unauthenticatedProfileBar = (
     <header className="profile-bar unauthenticated-profile-bar">
@@ -27,12 +45,12 @@ const ProfileBar = ({ showMainMenu }: Props) => {
       </svg>
       <span className="right-side">
         <span className="username">{auth.userInfo?.name}</span>
-        <img src={auth.userInfo?.profileUrl} alt="Current user" />
+        {profileImageUrl !== undefined && <img src={profileImageUrl} alt="Current user" />}
       </span>
     </header>
   )
 
-  return auth.handleSignIn === undefined ?
+  return !auth.isSignedIn ?
     unauthenticatedProfileBar :
     authenticatedProfileBar
 }
