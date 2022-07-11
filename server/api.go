@@ -61,6 +61,7 @@ func NewServer(c Config) (Server, error) {
 
 		r.Get("/health", s.handleHealth())
 		r.Get("/token", s.handleToken())
+		r.Get("/sign-out", s.handleSignOut())
 
 		r.Group(func(r chi.Router) {
 			r.Use(tokenVerifierMiddleware)
@@ -113,6 +114,18 @@ func (s Server) handleToken() http.HandlerFunc {
 			Value:    ats.accessToken,
 			HttpOnly: true,
 			Expires:  time.Now().Add(time.Hour * 168),
+		})
+		w.WriteHeader(http.StatusOK)
+	})
+}
+
+func (s Server) handleSignOut() http.HandlerFunc {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		http.SetCookie(w, &http.Cookie{
+			Name:     cookieNameAuthToken,
+			Value:    "",
+			HttpOnly: true,
+			Expires:  time.Now().Add(time.Hour * -1),
 		})
 		w.WriteHeader(http.StatusOK)
 	})
