@@ -40,16 +40,19 @@ function AuthProvider({ children }: { children: ReactNode }) {
   }
 
   const signOut = async () => {
-    console.log("signing out");
-    setUserInfo(undefined);
-    setIsSignedIn(false);
+    fetch(`/api/sign-out`, {
+      credentials: "include"
+    }).then(() => {
+      setUserInfo(undefined);
+      setIsSignedIn(false);
+    })
   }
 
   useEffect(() => {
     if (!isSignedIn) {
       handleSignIn();
     }
-  }, [isSignedIn])
+  })
 
   return (
     <AuthContext.Provider value={{ isSignedIn, handleSignIn, signOut, userInfo }}>
