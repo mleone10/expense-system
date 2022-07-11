@@ -6,15 +6,17 @@ function AuthCallback() {
   const auth = useAuth();
   const code = new URLSearchParams(window.location.search).get("code");
 
+  const handleSignIn = auth.handleSignIn;
+
   useEffect(() => {
     fetch(`/api/token?code=${code}`, {
       credentials: "include"
     }).then(response => {
       if (response.ok) {
-        auth.handleSignIn();
+        handleSignIn();
       }
     })
-  }, [code, auth])
+  }, [code, handleSignIn])
 
   if (auth.isSignedIn) {
     return <Navigate to="/home" />
