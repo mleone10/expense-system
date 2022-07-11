@@ -11,7 +11,7 @@ function AuthCallback() {
       credentials: "include"
     }).then(response => {
       if (response.ok) {
-        auth.setIsSignedIn(true);
+        auth.handleSignIn();
       }
     })
   }, [code, auth])

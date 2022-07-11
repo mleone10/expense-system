@@ -1,4 +1,3 @@
-import { useEffect, useState } from "react";
 import { SignInButton } from "components"
 import { useAuth } from "hooks"
 
@@ -9,29 +8,7 @@ interface Props {
 }
 
 const ProfileBar = ({ showMainMenu }: Props) => {
-  interface userInfoType {
-    name: string;
-    profileUrl: string;
-  }
-
   const auth = useAuth();
-  const [userInfo, setUserInfo] = useState<userInfoType | undefined>(undefined)
-
-  useEffect(() => {
-    if (!auth.isSignedIn) {
-      return
-    }
-
-    fetch(`/api/user`, {
-      credentials: "include"
-    }).then(response => {
-      if (response.ok) {
-        return response.json().then(res => res as userInfoType)
-      }
-    }).then(data => {
-      setUserInfo(data)
-    })
-  }, [auth.isSignedIn])
 
   const unauthenticatedProfileBar = (
     <header className="profile-bar unauthenticated-profile-bar">
@@ -49,13 +26,13 @@ const ProfileBar = ({ showMainMenu }: Props) => {
         <path d="M 0 7.5 L 0 12.5 L 50 12.5 L 50 7.5 Z M 0 22.5 L 0 27.5 L 50 27.5 L 50 22.5 Z M 0 37.5 L 0 42.5 L 50 42.5 L 50 37.5 Z"></path>
       </svg>
       <span className="right-side">
-        <span className="username">{userInfo?.name}</span>
-        <img src={userInfo?.profileUrl} alt="Current user" />
+        <span className="username">{auth.userInfo?.name}</span>
+        <img src={auth.userInfo?.profileUrl} alt="Current user" />
       </span>
     </header>
   )
 
-  return userInfo === undefined ?
+  return auth.handleSignIn === undefined ?
     unauthenticatedProfileBar :
     authenticatedProfileBar
 }
