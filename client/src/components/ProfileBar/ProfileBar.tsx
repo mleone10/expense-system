@@ -14,17 +14,17 @@ const ProfileBar = ({ showMainMenu }: Props) => {
 
   useEffect(() => {
     if (auth.userInfo?.profileUrl !== undefined) {
-      fetch(auth.userInfo?.profileUrl)
-        .then(res => {
-          if (res.ok) {
-            return res.blob()
-          }
-        })
-        .then(blob => {
-          if (blob !== undefined) {
-            setProfileImageUrl(URL.createObjectURL(blob))
-          }
-        })
+      fetch(auth.userInfo?.profileUrl, {
+        referrerPolicy: "no-referrer"
+      }).then(res => {
+        if (res.ok) {
+          return res.blob()
+        }
+      }).then(blob => {
+        if (blob !== undefined) {
+          setProfileImageUrl(URL.createObjectURL(blob))
+        }
+      })
     }
   }, [auth.userInfo?.profileUrl])
 
