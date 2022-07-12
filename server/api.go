@@ -114,7 +114,7 @@ func (s Server) handleToken() http.HandlerFunc {
 			HttpOnly: true,
 			Expires:  time.Now().Add(time.Hour * 168),
 		})
-		w.WriteHeader(http.StatusOK)
+		http.Redirect(w, r, s.auth.RedirectUrl(), http.StatusMovedPermanently)
 	})
 }
 
