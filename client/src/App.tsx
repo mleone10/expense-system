@@ -28,7 +28,6 @@ function App() {
             <Route element={<ProtectedRoute />}>
               <Route path="/home" element={<Home />} />
             </Route>
-            <Route path="/auth/callback" element={<AuthCallback />} />
           </Routes>
         </main>
       </div>
