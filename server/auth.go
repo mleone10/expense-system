@@ -20,6 +20,7 @@ type authClient struct {
 	cognitoClientId string
 	basicAuth       string
 	redirectUri     string
+	clientHostname  string
 }
 
 type authTokens struct {
@@ -46,6 +47,7 @@ func NewAuthClient(c authClientConfig) (*authClient, error) {
 		cognitoClientId: c.getCognitoClientId(),
 		basicAuth:       fmt.Sprintf("Basic %s", base64.StdEncoding.EncodeToString([]byte(fmt.Sprintf("%s:%s", c.getCognitoClientId(), c.getCognitoClientSecret())))),
 		redirectUri:     fmt.Sprintf("%s://%s/api/token", c.getClientScheme(), c.getClientHostname()),
+		clientHostname:  c.getClientHostname(),
 	}
 
 	return &a, nil
@@ -150,4 +152,8 @@ func (a *authClient) GetUserInfo(authToken string) (UserInfo, error) {
 	json.Unmarshal(bodyBytes, &userInfo)
 
 	return UserInfo(userInfo), nil
+}
+
+func (a *authClient) RedirectUrl() string {
+	return a.clientHostname
 }
