@@ -45,7 +45,7 @@ func NewAuthClient(c authClientConfig) (*authClient, error) {
 		client:          http.Client{},
 		cognitoClientId: c.getCognitoClientId(),
 		basicAuth:       fmt.Sprintf("Basic %s", base64.StdEncoding.EncodeToString([]byte(fmt.Sprintf("%s:%s", c.getCognitoClientId(), c.getCognitoClientSecret())))),
-		redirectUri:     fmt.Sprintf("%s://%s/auth/callback", c.getClientScheme(), c.getClientHostname()),
+		redirectUri:     fmt.Sprintf("%s://%s/api/token", c.getClientScheme(), c.getClientHostname()),
 	}
 
 	return &a, nil
