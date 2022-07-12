@@ -16,10 +16,11 @@ import (
 )
 
 type authClient struct {
-	client          http.Client
-	cognitoClientId string
-	basicAuth       string
-	redirectUri     string
+	client              http.Client
+	cognitoClientId     string
+	basicAuth           string
+	authCodeRedirectUri string
+	tokenRedirectUri    string
 }
 
 type authTokens struct {
@@ -42,10 +43,11 @@ const jwkUrl string = "https://cognito-idp.us-east-1.amazonaws.com/us-east-1_hQX
 func NewAuthClient(c authClientConfig) (*authClient, error) {
 
 	a := authClient{
-		client:          http.Client{},
-		cognitoClientId: c.getCognitoClientId(),
-		basicAuth:       fmt.Sprintf("Basic %s", base64.StdEncoding.EncodeToString([]byte(fmt.Sprintf("%s:%s", c.getCognitoClientId(), c.getCognitoClientSecret())))),
-		redirectUri:     fmt.Sprintf("%s://%s/auth/callback", c.getClientScheme(), c.getClientHostname()),
+		client:              http.Client{},
+		cognitoClientId:     c.getCognitoClientId(),
+		basicAuth:           fmt.Sprintf("Basic %s", base64.StdEncoding.EncodeToString([]byte(fmt.Sprintf("%s:%s", c.getCognitoClientId(), c.getCognitoClientSecret())))),
+		authCodeRedirectUri: fmt.Sprintf("%s://%s/api/token", c.getClientScheme(), c.getClientHostname()),
+		tokenRedirectUri:    fmt.Sprintf("%s://%s", c.getClientScheme(), c.getClientHostname()),
 	}
 
 	return &a, nil
@@ -61,7 +63,7 @@ func (a *authClient) GetAuthTokens(authCode string) (authTokens, error) {
 	data := url.Values{}
 	data.Add("grant_type", "authorization_code")
 	data.Add("client_id", a.cognitoClientId)
-	data.Add("redirect_uri", a.redirectUri)
+	data.Add("redirect_uri", a.authCodeRedirectUri)
 	data.Add("code", authCode)
 
 	req, err := http.NewRequest("POST", "https://auth.expense.mleone.dev/oauth2/token", strings.NewReader(data.Encode()))
@@ -150,4 +152,8 @@ func (a *authClient) GetUserInfo(authToken string) (UserInfo, error) {
 	json.Unmarshal(bodyBytes, &userInfo)
 
 	return UserInfo(userInfo), nil
+}
+
+func (a *authClient) RedirectUrl() string {
+	return a.tokenRedirectUri
 }
