@@ -52,7 +52,8 @@ function AuthProvider({ children }: { children: ReactNode }) {
     if (!isSignedIn) {
       handleSignIn();
     }
-  })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   return (
     <AuthContext.Provider value={{ isSignedIn, handleSignIn, signOut, userInfo }}>
