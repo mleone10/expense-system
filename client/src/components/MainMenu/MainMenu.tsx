@@ -33,8 +33,8 @@ const MainMenu = ({ isMainMenuVisible, clearMainMenu }: Props) => {
   return auth.isSignedIn ? (
     <nav className={classes} ref={ref}>
       <ul>
-        <Link to="/"><li>Home</li></Link>
-        <Link reloadDocument to="/"><li>Sign Out</li></Link>
+        <li><Link to="/home">Home</Link></li>
+        <li onClick={auth.signOut}><Link to="/">Sign Out</Link></li>
       </ul>
     </nav >
   ) : (<React.Fragment></React.Fragment>)

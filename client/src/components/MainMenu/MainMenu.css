@@ -24,11 +24,10 @@ nav.main-menu ul {
 nav.main-menu li {
   position: relative;
   padding: 1.5rem 2rem;
-  color: black;
   border-bottom: 1px solid rgba(0, 0, 0, 0.1);
 }
 
-nav.main-menu a:last-of-type li {
+nav.main-menu li:last-of-type {
   border-style: none;
 }
 
@@ -38,6 +37,7 @@ nav.main-menu li:hover {
 
 nav.main-menu a {
   text-decoration: none;
+  color: black;
 }
 
 @media only screen and (min-device-width: 667px) {

@@ -1,9 +1,12 @@
-import { Navigate, Outlet } from "react-router";
+import { Outlet } from "react-router";
 import { useAuth } from "hooks";
+import { UnauthenticatedApp } from "views";
 
 export const ProtectedRoute = () => {
-  if (!useAuth().isSignedIn) {
-    return <Navigate to="/" />
+  const auth = useAuth();
+
+  if (!auth.isSignedIn) {
+    return <UnauthenticatedApp />
   }
 
   return <Outlet />;

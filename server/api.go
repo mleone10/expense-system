@@ -61,6 +61,7 @@ func NewServer(c Config) (Server, error) {
 
 		r.Get("/health", s.handleHealth())
 		r.Get("/token", s.handleToken())
+		r.Get("/sign-out", s.handleSignOut())
 
 		r.Group(func(r chi.Router) {
 			r.Use(tokenVerifierMiddleware)
@@ -115,6 +116,18 @@ func (s Server) handleToken() http.HandlerFunc {
 			Expires:  time.Now().Add(time.Hour * 168),
 		})
 		http.Redirect(w, r, s.auth.RedirectUrl(), http.StatusMovedPermanently)
+	})
+}
+
+func (s Server) handleSignOut() http.HandlerFunc {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		http.SetCookie(w, &http.Cookie{
+			Name:     cookieNameAuthToken,
+			Value:    "",
+			HttpOnly: true,
+			Expires:  time.Now().Add(time.Hour * -1),
+		})
+		w.WriteHeader(http.StatusOK)
 	})
 }
 
@@ -215,11 +228,13 @@ func (s Server) handleGetUser() http.HandlerFunc {
 		authCookie, err := r.Cookie(cookieNameAuthToken)
 		if err != nil {
 			s.error(w, r, fmt.Errorf("failed to get auth cookie from request: %w", err))
+			return
 		}
 
 		userInfo, err := s.auth.GetUserInfo(authCookie.Value)
 		if err != nil {
 			s.error(w, r, fmt.Errorf("failed to get user info from identity provider: %w", err))
+			return
 		}
 
 		s.writeResponse(w, response(userInfo))
