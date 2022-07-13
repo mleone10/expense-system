@@ -14,6 +14,8 @@ const MainMenu = ({ isMainMenuVisible, clearMainMenu }: Props) => {
 
   useEffect(() => {
     const onClick = (e: MouseEvent) => {
+      // TODO: Close menu when user makes selection
+      // Currently only closes on click outside
       if (isMainMenuVisible && ref.current && e.target instanceof Node && !ref.current.contains(e.target)) {
         clearMainMenu()
       }
@@ -33,8 +35,9 @@ const MainMenu = ({ isMainMenuVisible, clearMainMenu }: Props) => {
   return auth.isSignedIn ? (
     <nav className={classes} ref={ref}>
       <ul>
-        <li><Link to="/home">Home</Link></li>
-        <li onClick={auth.signOut}><Link to="/">Sign Out</Link></li>
+        <Link to="/home"><li>Home</li></Link>
+        <Link to="/orgs"><li>Organizations</li></Link>
+        <Link to="/"><li onClick={auth.signOut}>Sign Out</li></Link>
       </ul>
     </nav >
   ) : (<React.Fragment></React.Fragment>)
