@@ -1,7 +1,7 @@
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import "./Organizations.css"
 
-interface orgs {
+interface orgData {
   orgs: org[]
 }
 
@@ -11,31 +11,122 @@ interface org {
   admin: boolean
 }
 
-const getOrgs = () => {
+const getOrgs = async () => {
   return fetch(`/api/orgs`, {
     credentials: "include"
   }).then(response => {
     if (response.ok) {
-      return response.json().then(body => body as orgs)
+      return response.json().then(body => body as orgData)
     }
   })
 }
 
-const Organizations = () => {
-  const [orgs, setOrgs] = useState<orgs>({ "orgs": [] })
+interface OrgsTableProps {
+  orgData: orgData
+}
 
-  useEffect(() => {
+const OrgsTable = (props: OrgsTableProps) => {
+  return (
+    <table className="orgs-table">
+      <thead>
+        <tr>
+          <th>Org Name</th>
+          <th>Role</th>
+        </tr>
+      </thead>
+      <tbody>
+        {props.orgData.orgs.map((org) => {
+          return (
+            <tr key={org.id}>
+              <td>{org.name}</td>
+              <td>{org.admin ? "Admin" : "Member"}</td>
+            </tr>
+          );
+        })}
+      </tbody>
+    </table>
+  )
+}
+
+interface newOrg {
+  name: string
+}
+
+interface newOrgResponse {
+  id: string
+}
+
+const createOrg = async (org: newOrg) => {
+  return fetch(`/api/orgs`, {
+    method: "POST",
+    body: JSON.stringify({
+      name: org.name
+    })
+  }).then(response => {
+    if (response.ok) {
+      return response.json().then(res => res as newOrgResponse)
+    }
+  })
+}
+
+interface CreateOrgFormProps {
+  onCreateOrg(): void
+}
+
+const CreateOrgForm = (props: CreateOrgFormProps) => {
+  const [orgName, setOrgName] = useState<string>("")
+
+  const handleOrgNameChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setOrgName(event.target.value)
+  }
+
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+    createOrg({ name: orgName }).then(res => {
+      console.log(res)
+      if (res !== undefined) {
+        setOrgName("")
+      }
+    }).then(() => {
+      props.onCreateOrg()
+    })
+    event.preventDefault()
+  }
+
+  return (
+    <section className="create-org-form">
+      <h2>Create New Organization</h2>
+      <form onSubmit={handleSubmit}>
+        <label>
+          Organization Name:
+          <input type="text" value={orgName} onChange={handleOrgNameChange} />
+        </label>
+        <input type="submit" value="Submit" />
+      </form>
+    </section>
+  )
+}
+
+const Organizations = () => {
+  const [orgData, setOrgs] = useState<orgData>({ "orgs": [] })
+
+  const loadOrgs = () => {
     getOrgs().then(orgs => {
       if (orgs !== undefined) {
         setOrgs(orgs)
       }
     })
+  }
+
+  useEffect(() => {
+    loadOrgs()
   }, [])
 
   return (
-    <section className="orgs">
+    <React.Fragment>
       <h1>Organizations</h1>
-    </section>
+      <OrgsTable orgData={orgData} />
+      <CreateOrgForm onCreateOrg={loadOrgs} />
+    </React.Fragment>
   )
 }
 

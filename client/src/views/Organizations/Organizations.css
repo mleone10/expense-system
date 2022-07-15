@@ -1,0 +1,14 @@
+.orgs-table {
+  width: 100%;
+  border-spacing: 0px;
+}
+
+.orgs-table tr {
+  height: 2rem;
+}
+
+.orgs-table th {
+  text-align: left;
+  background-color: var(--color-ash-gray);
+  font-size: 1.25rem;
+}
