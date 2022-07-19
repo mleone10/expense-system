@@ -104,8 +104,8 @@ const CreateOrgForm = (props: CreateOrgFormProps) => {
       <form onSubmit={handleSubmit}>
         <label>
           Organization Name:
-          <input type="text" value={orgName} onChange={handleOrgNameChange} />
         </label>
+        <input type="text" value={orgName} onChange={handleOrgNameChange} />
         <input className="submit" type="submit" value="Create Org" />
       </form>
     </section>

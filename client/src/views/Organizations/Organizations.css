@@ -46,7 +46,9 @@
 
 .create-org-form input:not(.submit) {
   margin: 0.5rem 0rem;
+  padding: 0px;
   width: 100%;
+  box-sizing: border-box;
 }
 
 .create-org-form input.submit {
