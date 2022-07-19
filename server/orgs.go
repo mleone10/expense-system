@@ -131,8 +131,8 @@ func (o orgRepo) createOrg(name, adminId string) (string, error) {
 	}
 
 	orgAdminItem, err := attributevalue.MarshalMap(orgUserRecord{
-		OrgId:     fmt.Sprintf("USER#%v", adminId),
-		UserIdKey: fmt.Sprintf("ORG#%v", id),
+		UserIdKey: fmt.Sprintf("USER#%v", adminId),
+		OrgId:     fmt.Sprintf("ORG#%v", id),
 		Role:      RoleAdmin,
 	})
 
