@@ -35,7 +35,7 @@ const OrgsTable = (props: OrgsTableProps) => {
         </tr>
       </thead>
       <tbody>
-        {props.orgData.orgs.map((org) => {
+        {props.orgData.orgs.sort((a, b) => a.name > b.name ? 1 : -1).map((org) => {
           return (
             <tr key={org.id}>
               <td>{org.name}</td>
