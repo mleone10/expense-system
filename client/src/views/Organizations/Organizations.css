@@ -36,6 +36,24 @@
   background-color: rgba(0, 0, 0, 0.2);
 }
 
+.create-org-form {
+  margin: 2rem 0rem;
+}
+
+.create-org-form label {
+  font-size: 1.2rem;
+}
+
+.create-org-form input:not(.submit) {
+  margin: 0.5rem 0rem;
+  width: 100%;
+}
+
+.create-org-form input.submit {
+  display: block;
+  margin: auto;
+}
+
 @media only screen and (min-device-width: 667px) {
 
   .orgs-table th:first-of-type,
