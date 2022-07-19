@@ -4,11 +4,47 @@
 }
 
 .orgs-table tr {
-  height: 2rem;
+  height: 3rem;
 }
 
 .orgs-table th {
   text-align: left;
   background-color: var(--color-ash-gray);
-  font-size: 1.25rem;
+}
+
+.orgs-table th,
+.orgs-table {
+  padding-top: 0.5rem;
+  padding-bottom: 0.5rem;
+}
+
+.orgs-table th:first-of-type,
+.orgs-table td:first-of-type {
+  padding-left: 0.5rem;
+}
+
+.orgs-table th:last-of-type,
+.orgs-table td:last-of-type {
+  padding-right: 0.5rem;
+}
+
+.orgs-table tbody tr:nth-of-type(even) {
+  background-color: rgba(0, 0, 0, 0.08);
+}
+
+.orgs-table tbody tr:hover {
+  background-color: rgba(0, 0, 0, 0.2);
+}
+
+@media only screen and (min-device-width: 667px) {
+
+  .orgs-table th:first-of-type,
+  .orgs-table td:first-of-type {
+    padding-left: 1rem;
+  }
+
+  .orgs-table th:last-of-type,
+  .orgs-table td:last-of-type {
+    padding-right: 1rem;
+  }
 }
