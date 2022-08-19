@@ -201,8 +201,21 @@ func (s Server) handleCreateNewOrg() http.HandlerFunc {
 }
 
 func (s Server) handleGetOrg() http.HandlerFunc {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	type response struct {
+		Id           string   `json:"id"`
+		Name         string   `json:"name"`
+		CreationDate string   `json:"creationDate"`
+		Members      []string `json:"members"`
+	}
 
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		_, err := s.getUserId(r)
+		if err != nil {
+			s.error(w, r, fmt.Errorf("failed to get user id from request: %w", err))
+			return
+		}
+
+		s.writeResponse(w, response{Members: []string{}})
 	})
 }
 
