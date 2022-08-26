@@ -25,7 +25,7 @@ func (hs HttpServer) requestIdMiddleware(next http.Handler) http.Handler {
 	})
 }
 
-func (hs HttpServer) getRequestId(r *http.Request) string {
+func getRequestId(r *http.Request) string {
 	userId := r.Context().Value(keyRequestId)
 	if userId != nil {
 		return userId.(string)
