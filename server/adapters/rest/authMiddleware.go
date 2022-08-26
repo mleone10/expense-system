@@ -36,7 +36,7 @@ func (hs HttpServer) authMiddleware(next http.Handler) http.Handler {
 func getUserId(r *http.Request) domain.UserId {
 	userId := r.Context().Value(keyUserId)
 	if userId != nil {
-		return userId.(domain.UserId)
+		return domain.UserId(userId.(string))
 	}
 	return ""
 }
