@@ -24,10 +24,12 @@ func main() {
 
 	orgService := service.NewOrgService(orgRepo)
 
+	logger := stdlogger.NewLogger()
+
 	server, _ := rest.NewServer(
 		rest.WithAuthClient(authClient),
 		rest.WithOrgService(orgService),
-		rest.WithLogger(stdlogger.Logger{}),
+		rest.WithLogger(logger),
 	)
 
 	fmt.Println(http.ListenAndServe(":8080", server))
