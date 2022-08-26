@@ -19,10 +19,6 @@ package rest
 // 	orgs   orgRepo
 // }
 
-// type keyTypeRequestId string
-
-// const keyRequestId keyTypeRequestId = "requestId"
-
 // const urlParamOrgId string = "orgId"
 
 // const testAdminUserId string = "nonProdTestAdmin"
@@ -122,31 +118,6 @@ package rest
 // 		s.logger.Printf("Request: %s Method: %s URI: %s", s.getRequestId(r), r.Method, r.RequestURI)
 // 		next.ServeHTTP(w, r)
 // 	})
-// }
-
-// func (s Server) requestId(next http.Handler) http.Handler {
-// 	genRequestId := func() string {
-// 		requestUuid, err := uuid.NewV4()
-// 		if err != nil {
-// 			s.logger.Println("Failed to generate request ID: %w", err)
-// 			requestUuid = uuid.FromStringOrNil("")
-// 		}
-// 		return requestUuid.String()
-// 	}
-
-// 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-// 		req := r.WithContext(context.WithValue(r.Context(), keyRequestId, genRequestId()))
-// 		next.ServeHTTP(w, req)
-// 	})
-// }
-
-// func (s Server) getRequestId(r *http.Request) string {
-// 	requestId := r.Context().Value(keyRequestId)
-// 	if id, ok := requestId.(string); ok {
-// 		return id
-// 	} else {
-// 		return "<no request id found>"
-// 	}
 // }
 
 // func (s Server) noOpTokenVerifier(next http.Handler) http.Handler {

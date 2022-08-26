@@ -34,7 +34,7 @@ func NewServer(options ...OptionFunc) (*HttpServer, error) {
 	}
 
 	hs.router.Route("/api", func(r chi.Router) {
-		// r.Use(s.requestId)
+		r.Use(hs.requestIdMiddleware)
 		// r.Use(s.logRequests)
 
 		r.Get("/health", hs.handleHealth())
