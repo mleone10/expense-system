@@ -1,24 +1,29 @@
 package main
 
 import (
-	"log"
+	"fmt"
 	"net/http"
 	"os"
 
-	api "github.com/mleone10/expense-system"
+	"github.com/mleone10/expense-system/adapters/auth"
+	"github.com/mleone10/expense-system/adapters/rest"
+	"github.com/mleone10/expense-system/adapters/stdlogger"
 )
 
 func main() {
-	server, err := api.NewServer(api.Config{
-		CognitoClientId:     "6ka3m790cv5hrhjdqt2ju89v45",
-		CognitoClientSecret: os.Getenv("COGNITO_CLIENT_SECRET"),
-		ClientHostname:      "localhost:3000",
-		ClientScheme:        "http",
-		SkipAuth:            true,
-	})
-	if err != nil {
-		log.Fatalf("Failed to initialize server: %v", err)
-	}
+	authClient := auth.NewAuthClient(
+		auth.WithClientHostname("localhost:3000"),
+		auth.WithClientScheme("http"),
+		auth.WithCognitoClientId("6ka3m790cv5hrhjdqt2ju89v45"),
+		auth.WithCognitoClientSecret(os.Getenv("COGNITO_CLIENT_SECRET")),
+	)
 
-	http.ListenAndServe(":8080", server)
+	logger := stdlogger.Logger{}
+
+	server, _ := rest.NewServer(
+		rest.WithAuthClient(authClient),
+		rest.WithLogger(logger),
+	)
+
+	fmt.Println(http.ListenAndServe(":8080", server))
 }
