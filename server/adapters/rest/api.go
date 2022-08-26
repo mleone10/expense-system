@@ -31,8 +31,6 @@ package rest
 // 	}
 
 // 	s.router.Route("/api", func(r chi.Router) {
-// 		r.Use(s.requestId)
-// 		r.Use(s.logRequests)
 
 // 		r.Group(func(r chi.Router) {
 // 			r.Route("/orgs", func(r chi.Router) {
@@ -102,21 +100,6 @@ package rest
 // 		}
 
 // 		s.writeResponse(w, response(userInfo))
-// 	})
-// }
-
-// func (s Server) logRequests(next http.Handler) http.Handler {
-// 	startTime := func() time.Time {
-// 		return time.Now()
-// 	}
-// 	logReturn := func(startTime time.Time, r *http.Request) {
-// 		s.logger.Printf("Request: %s completed in %s", s.getRequestId(r), time.Since(startTime))
-// 	}
-
-// 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-// 		defer logReturn(startTime(), r)
-// 		s.logger.Printf("Request: %s Method: %s URI: %s", s.getRequestId(r), r.Method, r.RequestURI)
-// 		next.ServeHTTP(w, r)
 // 	})
 // }
 
