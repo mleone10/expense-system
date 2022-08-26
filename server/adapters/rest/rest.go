@@ -16,10 +16,11 @@ const (
 )
 
 type HttpServer struct {
-	router     chi.Router
-	authClient domain.AuthClient
-	orgService domain.OrgService
-	logger     domain.Logger
+	router               chi.Router
+	authClient           domain.AuthClient
+	orgService           domain.OrgService
+	logger               domain.Logger
+	activeAuthMiddleware func(http.Handler) http.Handler
 }
 
 type OptionFunc func(*HttpServer)
@@ -28,6 +29,7 @@ func NewServer(options ...OptionFunc) (*HttpServer, error) {
 	hs := &HttpServer{
 		router: chi.NewRouter(),
 	}
+	hs.activeAuthMiddleware = hs.authMiddleware
 
 	for _, opt := range options {
 		opt(hs)
@@ -42,7 +44,7 @@ func NewServer(options ...OptionFunc) (*HttpServer, error) {
 		r.Get("/sign-out", hs.handleSignOut())
 
 		r.Group(func(r chi.Router) {
-			r.Use(hs.authMiddleware)
+			r.Use(hs.activeAuthMiddleware)
 
 			r.Route("/orgs", func(r chi.Router) {
 				r.Get("/", hs.handleGetOrgs())
@@ -78,6 +80,12 @@ func WithOrgService(orgService domain.OrgService) OptionFunc {
 func WithLogger(logger domain.Logger) OptionFunc {
 	return func(hs *HttpServer) {
 		hs.logger = logger
+	}
+}
+
+func WithSkipAuth() OptionFunc {
+	return func(hs *HttpServer) {
+		hs.activeAuthMiddleware = hs.noOpAuthVerifier
 	}
 }
 

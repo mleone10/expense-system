@@ -21,8 +21,6 @@ package rest
 
 // const urlParamOrgId string = "orgId"
 
-// const testAdminUserId string = "nonProdTestAdmin"
-
 // func NewServer(c Config) (Server, error) {
 
 // 	tokenVerifierMiddleware := s.verifyToken
@@ -100,12 +98,5 @@ package rest
 // 		}
 
 // 		s.writeResponse(w, response(userInfo))
-// 	})
-// }
-
-// func (s Server) noOpTokenVerifier(next http.Handler) http.Handler {
-// 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-// 		req := r.WithContext(context.WithValue(r.Context(), keyUserId, testAdminUserId))
-// 		next.ServeHTTP(w, req)
 // 	})
 // }

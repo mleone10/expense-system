@@ -30,6 +30,7 @@ func main() {
 		rest.WithAuthClient(authClient),
 		rest.WithOrgService(orgService),
 		rest.WithLogger(logger),
+		rest.WithSkipAuth(),
 	)
 
 	fmt.Println(http.ListenAndServe(":8080", server))
