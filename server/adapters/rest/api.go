@@ -23,11 +23,6 @@ package rest
 
 // func NewServer(c Config) (Server, error) {
 
-// 	tokenVerifierMiddleware := s.verifyToken
-// 	if c.getSkipAuth() {
-// 		tokenVerifierMiddleware = s.noOpTokenVerifier
-// 	}
-
 // 	s.router.Route("/api", func(r chi.Router) {
 
 // 		r.Group(func(r chi.Router) {
@@ -44,38 +39,6 @@ package rest
 // 	})
 
 // 	return s, nil
-// }
-
-// func (s Server) handleCreateNewOrg() http.HandlerFunc {
-// 	type request struct {
-// 		Name string `json:"name"`
-// 	}
-
-// 	type response struct {
-// 		Id string `json:"id"`
-// 	}
-
-// 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-// 		var req request
-// 		if err := s.readRequest(r, &req); err != nil {
-// 			s.error(w, r, fmt.Errorf("failed to read org creation request: %w", err))
-// 			return
-// 		}
-
-// 		userId, err := s.getUserId(r)
-// 		if err != nil {
-// 			s.error(w, r, fmt.Errorf("failed to get user id from request: %w", err))
-// 			return
-// 		}
-
-// 		id, err := s.orgs.createOrg(req.Name, userId)
-// 		if err != nil {
-// 			s.error(w, r, fmt.Errorf("failed to create org with name %v: %w", req.Name, err))
-// 			return
-// 		}
-
-// 		s.writeResponse(w, response{Id: id})
-// 	})
 // }
 
 // func (s Server) handleGetUser() http.HandlerFunc {

@@ -1,5 +1,7 @@
 package domain
 
+import "context"
+
 type OrgId string
 
 type Organization struct {
@@ -9,10 +11,11 @@ type Organization struct {
 }
 
 type OrgService interface {
-	GetOrgsForUser(UserId) ([]Organization, error)
+	GetOrgsForUser(context.Context, UserId) ([]Organization, error)
+	CreateOrg(ctx context.Context, name string, adminId UserId) (Organization, error)
 }
 
 type OrgRepo interface {
-	GetOrg(OrgId) (Organization, error)
-	GetOrgsForUser(UserId) ([]Organization, error)
+	GetOrg(context.Context, OrgId) (Organization, error)
+	GetOrgsForUser(context.Context, UserId) ([]Organization, error)
 }

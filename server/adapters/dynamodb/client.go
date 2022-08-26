@@ -7,7 +7,6 @@ import (
 	"github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/service/dynamodb"
 	"github.com/aws/aws-sdk-go/aws"
-	"github.com/mleone10/expense-system/domain"
 )
 
 type Client struct {
@@ -29,12 +28,4 @@ func NewClient() (*Client, error) {
 	}
 
 	return c, nil
-}
-
-func (c *Client) GetOrg(orgId domain.OrgId) (domain.Organization, error) {
-	return domain.Organization{}, nil
-}
-
-func (c *Client) GetOrgsForUser(userId domain.UserId) ([]domain.Organization, error) {
-	return []domain.Organization{}, nil
 }

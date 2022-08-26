@@ -1,6 +1,10 @@
 package service
 
-import "github.com/mleone10/expense-system/domain"
+import (
+	"context"
+
+	"github.com/mleone10/expense-system/domain"
+)
 
 type OrgService struct {
 	orgRepo domain.OrgRepo
@@ -12,6 +16,10 @@ func NewOrgService(orgRepo domain.OrgRepo) *OrgService {
 	}
 }
 
-func (s *OrgService) GetOrgsForUser(userId domain.UserId) ([]domain.Organization, error) {
-	return s.orgRepo.GetOrgsForUser(userId)
+func (s *OrgService) GetOrgsForUser(ctx context.Context, userId domain.UserId) ([]domain.Organization, error) {
+	return s.orgRepo.GetOrgsForUser(ctx, userId)
+}
+
+func (s *OrgService) CreateOrg(ctx context.Context, name string, adminId domain.UserId) (domain.Organization, error) {
+	return domain.Organization{}, nil
 }

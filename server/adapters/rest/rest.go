@@ -48,7 +48,7 @@ func NewServer(options ...OptionFunc) (*HttpServer, error) {
 
 			r.Route("/orgs", func(r chi.Router) {
 				r.Get("/", hs.handleGetOrgs())
-				// r.Post("/", s.handleCreateNewOrg())
+				r.Post("/", hs.handleCreateNewOrg())
 				// r.Route(fmt.Sprintf("/{%s}", urlParamOrgId), func(r chi.Router) {
 				// 	r.Get("/", s.handleGetOrg())
 				// 	r.Post("/", s.handleUpdateOrg())
@@ -149,7 +149,7 @@ func (hs HttpServer) handleGetOrgs() http.HandlerFunc {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		userId := getUserId(r)
 
-		orgs, err := hs.orgService.GetOrgsForUser(userId)
+		orgs, err := hs.orgService.GetOrgsForUser(r.Context(), userId)
 		if err != nil {
 			hs.writeError(w, r, err)
 		}
@@ -164,6 +164,34 @@ func (hs HttpServer) handleGetOrgs() http.HandlerFunc {
 		}
 
 		writeResponse(w, res)
+	})
+}
+
+func (hs HttpServer) handleCreateNewOrg() http.HandlerFunc {
+	type request struct {
+		Name string `json:"name"`
+	}
+
+	type response struct {
+		Id string `json:"id"`
+	}
+
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		var req request
+		if err := readRequest(r, &req); err != nil {
+			hs.writeError(w, r, fmt.Errorf("failed to read org creation request: %w", err))
+			return
+		}
+
+		userId := getUserId(r)
+
+		org, err := hs.orgService.CreateOrg(r.Context(), req.Name, userId)
+		if err != nil {
+			hs.writeError(w, r, fmt.Errorf("failed to create org: %w", err))
+			return
+		}
+
+		writeResponse(w, response{Id: string(org.Id)})
 	})
 }
 
