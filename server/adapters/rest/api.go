@@ -20,34 +20,14 @@ package rest
 // }
 
 // type keyTypeRequestId string
-// type keyTypeUserId string
 
 // const keyRequestId keyTypeRequestId = "requestId"
-// const keyUserId keyTypeUserId = "userId"
-
-// const cookieNameAuthToken string = "authToken"
 
 // const urlParamOrgId string = "orgId"
 
 // const testAdminUserId string = "nonProdTestAdmin"
 
 // func NewServer(c Config) (Server, error) {
-// 	authClient, err := NewAuthClient(c)
-// 	if err != nil {
-// 		return Server{}, fmt.Errorf("failed to initialize auth client: %w", err)
-// 	}
-
-// 	orgRepo, err := NewOrgRepo()
-// 	if err != nil {
-// 		return Server{}, fmt.Errorf("failed to initialize org repo: %w", err)
-// 	}
-
-// 	s := Server{
-// 		auth:   authClient,
-// 		router: chi.NewRouter(),
-// 		logger: log.New(os.Stderr, "", log.LstdFlags),
-// 		orgs:   orgRepo,
-// 	}
 
 // 	tokenVerifierMiddleware := s.verifyToken
 // 	if c.getSkipAuth() {
@@ -59,15 +39,9 @@ package rest
 // 		r.Use(s.logRequests)
 
 // 		r.Group(func(r chi.Router) {
-// 			r.Use(tokenVerifierMiddleware)
-
 // 			r.Route("/orgs", func(r chi.Router) {
-// 				r.Get("/", s.handleGetOrgs())
 // 				r.Post("/", s.handleCreateNewOrg())
 // 				r.Route(fmt.Sprintf("/{%s}", urlParamOrgId), func(r chi.Router) {
-// 					r.Get("/", s.handleGetOrg())
-// 					r.Post("/", s.handleUpdateOrg())
-// 					r.Delete("/", s.handleDeleteOrg())
 // 				})
 // 			})
 
@@ -78,43 +52,6 @@ package rest
 // 	})
 
 // 	return s, nil
-// }
-
-// func (s Server) handleGetOrgs() http.HandlerFunc {
-// 	type org struct {
-// 		Name  string `json:"name"`
-// 		Id    string `json:"id"`
-// 		Admin bool   `json:"admin"`
-// 	}
-
-// 	type response struct {
-// 		Orgs []org `json:"orgs"`
-// 	}
-
-// 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-// 		userId, err := s.getUserId(r)
-// 		if err != nil {
-// 			s.error(w, r, fmt.Errorf("failed to get user id from request: %w", err))
-// 			return
-// 		}
-
-// 		orgs, err := s.orgs.getOrgsForUser(userId)
-// 		if err != nil {
-// 			s.error(w, r, fmt.Errorf("failed to retrieve orgs for user %v: %w", userId, err))
-// 			return
-// 		}
-
-// 		res := response{Orgs: []org{}}
-// 		for _, o := range orgs {
-// 			res.Orgs = append(res.Orgs, org{
-// 				Name:  o.Name,
-// 				Id:    o.Id,
-// 				Admin: o.IsAdmin(),
-// 			})
-// 		}
-
-// 		s.writeResponse(w, res)
-// 	})
 // }
 
 // func (s Server) handleCreateNewOrg() http.HandlerFunc {
@@ -146,24 +83,6 @@ package rest
 // 		}
 
 // 		s.writeResponse(w, response{Id: id})
-// 	})
-// }
-
-// func (s Server) handleGetOrg() http.HandlerFunc {
-// 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-
-// 	})
-// }
-
-// func (s Server) handleUpdateOrg() http.HandlerFunc {
-// 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-
-// 	})
-// }
-
-// func (s Server) handleDeleteOrg() http.HandlerFunc {
-// 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-
 // 	})
 // }
 
@@ -228,38 +147,6 @@ package rest
 // 	} else {
 // 		return "<no request id found>"
 // 	}
-// }
-
-// func (s Server) getUserId(r *http.Request) (string, error) {
-// 	userId := r.Context().Value(keyUserId)
-// 	if id, ok := userId.(string); !ok {
-// 		return "", fmt.Errorf("failed to convert user id to string")
-// 	} else {
-// 		return id, nil
-// 	}
-// }
-
-// func (s Server) verifyToken(next http.Handler) http.Handler {
-// 	markUnauthorized := func(w http.ResponseWriter) {
-// 		http.Error(w, "unauthorized", http.StatusUnauthorized)
-// 	}
-
-// 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-// 		tokenCookie, err := r.Cookie(cookieNameAuthToken)
-// 		if err != nil {
-// 			markUnauthorized(w)
-// 			return
-// 		}
-
-// 		validatedToken, err := s.auth.TokenIsValid(tokenCookie.Value)
-// 		if err != nil {
-// 			s.error(w, r, fmt.Errorf("error while verifying auth token: %w", err))
-// 			return
-// 		}
-
-// 		req := r.WithContext(context.WithValue(r.Context(), keyUserId, validatedToken.UserId()))
-// 		next.ServeHTTP(w, req)
-// 	})
 // }
 
 // func (s Server) noOpTokenVerifier(next http.Handler) http.Handler {

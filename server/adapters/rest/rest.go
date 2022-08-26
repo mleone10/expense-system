@@ -18,6 +18,7 @@ const (
 type HttpServer struct {
 	router     chi.Router
 	authClient domain.AuthClient
+	orgService domain.OrgService
 	logger     domain.Logger
 }
 
@@ -40,23 +41,23 @@ func NewServer(options ...OptionFunc) (*HttpServer, error) {
 		r.Get("/token", hs.handleToken())
 		r.Get("/sign-out", hs.handleSignOut())
 
-		// r.Group(func(r chi.Router) {
-		// 	r.Use(tokenVerifierMiddleware)
+		r.Group(func(r chi.Router) {
+			r.Use(hs.authMiddleware)
 
-		// 	r.Route("/orgs", func(r chi.Router) {
-		// 		r.Get("/", s.handleGetOrgs())
-		// 		r.Post("/", s.handleCreateNewOrg())
-		// 		r.Route(fmt.Sprintf("/{%s}", urlParamOrgId), func(r chi.Router) {
-		// 			r.Get("/", s.handleGetOrg())
-		// 			r.Post("/", s.handleUpdateOrg())
-		// 			r.Delete("/", s.handleDeleteOrg())
-		// 		})
-		// 	})
+			r.Route("/orgs", func(r chi.Router) {
+				r.Get("/", hs.handleGetOrgs())
+				// r.Post("/", s.handleCreateNewOrg())
+				// r.Route(fmt.Sprintf("/{%s}", urlParamOrgId), func(r chi.Router) {
+				// 	r.Get("/", s.handleGetOrg())
+				// 	r.Post("/", s.handleUpdateOrg())
+				// 	r.Delete("/", s.handleDeleteOrg())
+				// })
+			})
 
-		// 	r.Route("/user", func(r chi.Router) {
-		// 		r.Get("/", s.handleGetUser())
-		// 	})
-		// })
+			// r.Route("/user", func(r chi.Router) {
+			// 	r.Get("/", s.handleGetUser())
+			// })
+		})
 	})
 
 	return hs, nil
@@ -65,6 +66,12 @@ func NewServer(options ...OptionFunc) (*HttpServer, error) {
 func WithAuthClient(authClient domain.AuthClient) OptionFunc {
 	return func(hs *HttpServer) {
 		hs.authClient = authClient
+	}
+}
+
+func WithOrgService(orgService domain.OrgService) OptionFunc {
+	return func(hs *HttpServer) {
+		hs.orgService = orgService
 	}
 }
 
@@ -117,6 +124,38 @@ func (hs HttpServer) handleSignOut() http.HandlerFunc {
 			Expires:  time.Now().Add(time.Hour * -1),
 		})
 		w.WriteHeader(http.StatusOK)
+	})
+}
+
+func (hs HttpServer) handleGetOrgs() http.HandlerFunc {
+	type org struct {
+		Name  string `json:"name"`
+		Id    string `json:"id"`
+		Admin bool   `json:"admin"`
+	}
+
+	type response struct {
+		Orgs []org `json:"orgs"`
+	}
+
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		userId := getUserId(r)
+
+		orgs, err := hs.orgService.GetOrgsForUser(userId)
+		if err != nil {
+			hs.writeError(w, r, err)
+		}
+
+		res := response{Orgs: []org{}}
+		for _, o := range orgs {
+			res.Orgs = append(res.Orgs, org{
+				Name: o.Name,
+				Id:   string(o.Id),
+				// Admin: o.IsAdmin(),
+			})
+		}
+
+		writeResponse(w, res)
 	})
 }
 
