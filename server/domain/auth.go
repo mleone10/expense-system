@@ -1,5 +1,6 @@
 package domain
 
+// An AuthClient is capable of performing authentication via the OAuth Auth Code flow.
 type AuthClient interface {
 	GetAuthTokens(string) (AuthTokens, error)
 	RedirectUrl() string
