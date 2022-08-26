@@ -1,13 +1,15 @@
 package domain
 
-type Id string
+type OrgId string
+type UserId string
 
 type Organization struct {
-	Id      Id
+	Id      OrgId
 	Name    string
-	Members []Member
+	Members []User
 }
 
-type Member struct {
+type User struct {
+	Id   UserId
 	Name string
 }
