@@ -1,8 +1,11 @@
 package domain
 
+import "github.com/lestrrat-go/jwx/jwt"
+
 // An AuthClient is capable of performing authentication via the OAuth Auth Code flow.
 type AuthClient interface {
 	GetAuthTokens(string) (AuthTokens, error)
+	TokenIsValid(string) (jwt.Token, error)
 	RedirectUrl() string
 }
 
