@@ -23,8 +23,6 @@ type AuthClient struct {
 	clientScheme        string
 	cognitoClientId     string
 	cognitoClientSecret string
-	basicAuth           string
-	authCodeRedirectUri string
 }
 
 // OptionFuncs are used to configure an AuthClient using Functional Configuration
