@@ -33,23 +33,35 @@ func (c *Client) GetOrg(ctx context.Context, orgId domain.OrgId) (domain.Organiz
 
 	usersRes, err := c.db.Query(ctx, &dynamodb.QueryInput{
 		TableName:              c.table,
-		KeyConditionExpression: aws.String("sk = :orgId and begins_with(pk, :userPrefix)"),
+		KeyConditionExpression: aws.String("pk = :orgId and begins_with(sk, :userPrefix)"),
 		ExpressionAttributeValues: map[string]types.AttributeValue{
 			":orgId":      &types.AttributeValueMemberS{Value: fmt.Sprintf("%s%s", prefixOrg, orgId)},
-			":userPrefix": &types.AttributeValueMemberS{Value: prefixOrg},
+			":userPrefix": &types.AttributeValueMemberS{Value: prefixUser},
 		},
 	})
+	if err != nil {
+		return domain.Organization{}, fmt.Errorf("failed to query dynamodb for members")
+	}
 
-	// TODO: Finish querying org members, mapping query response, and adding to returned Org
 	orgUserRecords := []orgUserRecord{}
 	err = attributevalue.UnmarshalListOfMaps(usersRes.Items, &orgUserRecords)
 	if err != nil {
 		return domain.Organization{}, fmt.Errorf("failed to parse dynamodb response: %w", err)
 	}
 
+	members := []domain.Member{}
+	for _, orgUser := range orgUserRecords {
+		userId := strings.Split(orgUser.UserIdKey, "#")[1]
+		members = append(members, domain.Member{
+			Id:    domain.UserId(userId),
+			Admin: orgUser.Admin,
+		})
+	}
+
 	return domain.Organization{
-		Id:   domain.OrgId(or.orgId),
-		Name: or.name,
+		Id:      domain.OrgId(or.OrgId),
+		Name:    or.Name,
+		Members: members,
 	}, nil
 }
 
@@ -76,7 +88,7 @@ func (c *Client) GetOrgsForUser(ctx context.Context, userId domain.UserId) ([]do
 
 	orgs := []domain.Organization{}
 	for _, orgUser := range orgUserRecords {
-		orgId := domain.OrgId(strings.Split(orgUser.orgId, "#")[1])
+		orgId := domain.OrgId(strings.Split(orgUser.OrgId, "#")[1])
 
 		org, err := c.GetOrg(ctx, orgId)
 		if err != nil {

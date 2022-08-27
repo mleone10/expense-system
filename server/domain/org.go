@@ -7,7 +7,21 @@ type OrgId string
 type Organization struct {
 	Id      OrgId
 	Name    string
-	Members []User
+	Members []Member
+}
+
+type Member struct {
+	Id    UserId
+	Admin bool
+}
+
+func (o Organization) IsAdmin(id UserId) bool {
+	for _, m := range o.Members {
+		if m.Id == id && m.Admin {
+			return true
+		}
+	}
+	return false
 }
 
 type OrgService interface {

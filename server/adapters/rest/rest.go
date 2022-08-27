@@ -157,9 +157,9 @@ func (hs HttpServer) handleGetOrgs() http.HandlerFunc {
 		res := response{Orgs: []org{}}
 		for _, o := range orgs {
 			res.Orgs = append(res.Orgs, org{
-				Name: o.Name,
-				Id:   string(o.Id),
-				// Admin: o.IsAdmin(),
+				Name:  o.Name,
+				Id:    string(o.Id),
+				Admin: o.IsAdmin(userId),
 			})
 		}
 
