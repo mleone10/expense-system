@@ -1,7 +1,6 @@
 package rest
 
 import (
-	"context"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -186,6 +185,10 @@ func (hs HttpServer) handleCreateNewOrg() http.HandlerFunc {
 		userId := getUserId(r)
 
 		org, err := hs.orgService.CreateOrg(r.Context(), req.Name, userId)
+		if err == domain.ErrMaxOrgs {
+			hs.writeClientError(w, r, fmt.Errorf("failed to create org: %w", err))
+			return
+		}
 		if err != nil {
 			hs.writeError(w, r, fmt.Errorf("failed to create org: %w", err))
 			return
@@ -205,6 +208,10 @@ func writeResponse(w http.ResponseWriter, src interface{}) error {
 
 func (hs HttpServer) writeError(w http.ResponseWriter, r *http.Request, err error) {
 	http.Error(w, "internal server error", http.StatusInternalServerError)
-	hs.logger.Print(context.Background(), err)
-	// hs.logger.Printf("Request: %s %v", hs.getRequestId(r), err)
+	hs.logger.Print(r.Context(), err)
+}
+
+func (hs HttpServer) writeClientError(w http.ResponseWriter, r *http.Request, err error) {
+	http.Error(w, "invalid request", http.StatusBadRequest)
+	hs.logger.Print(r.Context(), err)
 }

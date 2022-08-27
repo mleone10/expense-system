@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/mleone10/expense-system/domain"
 )
@@ -21,5 +22,24 @@ func (s *OrgService) GetOrgsForUser(ctx context.Context, userId domain.UserId) (
 }
 
 func (s *OrgService) CreateOrg(ctx context.Context, name string, adminId domain.UserId) (domain.Organization, error) {
+	orgs, err := s.orgRepo.GetOrgsForUser(ctx, adminId)
+	if err != nil {
+		return domain.Organization{}, fmt.Errorf("failed to list existing orgs: %w", err)
+	}
+
+	if numOrgsAsAdmin(orgs, adminId) >= 3 {
+		return domain.Organization{}, domain.ErrMaxOrgs
+	}
+
 	return domain.Organization{}, nil
+}
+
+func numOrgsAsAdmin(orgs []domain.Organization, userId domain.UserId) int {
+	adminCount := 0
+	for _, o := range orgs {
+		if o.IsAdmin(userId) {
+			adminCount++
+		}
+	}
+	return adminCount
 }

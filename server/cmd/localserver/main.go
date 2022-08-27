@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"net/http"
 	"os"
 
@@ -33,5 +32,5 @@ func main() {
 		rest.WithSkipAuth(),
 	)
 
-	fmt.Println(http.ListenAndServe(":8080", server))
+	http.ListenAndServe(":8080", server)
 }

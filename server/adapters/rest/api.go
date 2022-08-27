@@ -1,24 +1,5 @@
 package rest
 
-// import (
-// 	"context"
-// 	"fmt"
-// 	"log"
-// 	"net/http"
-// 	"os"
-// 	"time"
-
-// 	"github.com/go-chi/chi/v5"
-// 	"github.com/gofrs/uuid"
-// )
-
-// type Server struct {
-// 	auth   *authClient
-// 	router chi.Router
-// 	logger *log.Logger
-// 	orgs   orgRepo
-// }
-
 // const urlParamOrgId string = "orgId"
 
 // func NewServer(c Config) (Server, error) {

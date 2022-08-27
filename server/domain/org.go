@@ -1,6 +1,11 @@
 package domain
 
-import "context"
+import (
+	"context"
+	"errors"
+)
+
+var ErrMaxOrgs = errors.New("user has reached the org limit")
 
 type OrgId string
 
