@@ -6,13 +6,13 @@ const (
 )
 
 type orgRecord struct {
-	OrgId         string `dynamodbav:"pk"`
-	OrgPrimaryKey string `dynamodbav:"sk"`
-	Name          string `dynamodbav:"name"`
+	orgId   string `dynamodbav:"pk"`
+	orgFlag string `dynamodbav:"sk"`
+	name    string `dynamodbav:"name"`
 }
 
 type orgUserRecord struct {
-	OrgId     string `dynamodbav:"pk"`
-	UserIdKey string `dynamodbav:"sk"`
-	Admin     bool   `dynamodbav:"admin"`
+	orgId     string `dynamodbav:"pk"`
+	userIdKey string `dynamodbav:"sk"`
+	admin     bool   `dynamodbav:"admin"`
 }

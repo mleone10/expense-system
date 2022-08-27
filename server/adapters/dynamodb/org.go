@@ -12,8 +12,45 @@ import (
 	"github.com/mleone10/expense-system/domain"
 )
 
+// GetOrg retrieves all details of the organization with the given ID.  If no org exists with that ID, an error is returned.
 func (c *Client) GetOrg(ctx context.Context, orgId domain.OrgId) (domain.Organization, error) {
-	return domain.Organization{}, nil
+	orgRes, err := c.db.GetItem(ctx, &dynamodb.GetItemInput{
+		TableName: c.table,
+		Key: map[string]types.AttributeValue{
+			"pk": &types.AttributeValueMemberS{Value: fmt.Sprintf("%s%s", prefixOrg, orgId)},
+			"sk": &types.AttributeValueMemberS{Value: "ORG"},
+		},
+	})
+	if err != nil {
+		return domain.Organization{}, fmt.Errorf("failed to retrieve org %v: %w", orgId, err)
+	}
+	if orgRes.Item == nil {
+		return domain.Organization{}, fmt.Errorf("no org found with id %v", orgId)
+	}
+
+	or := orgRecord{}
+	attributevalue.UnmarshalMap(orgRes.Item, &or)
+
+	usersRes, err := c.db.Query(ctx, &dynamodb.QueryInput{
+		TableName:              c.table,
+		KeyConditionExpression: aws.String("sk = :orgId and begins_with(pk, :userPrefix)"),
+		ExpressionAttributeValues: map[string]types.AttributeValue{
+			":orgId":      &types.AttributeValueMemberS{Value: fmt.Sprintf("%s%s", prefixOrg, orgId)},
+			":userPrefix": &types.AttributeValueMemberS{Value: prefixOrg},
+		},
+	})
+
+	// TODO: Finish querying org members, mapping query response, and adding to returned Org
+	orgUserRecords := []orgUserRecord{}
+	err = attributevalue.UnmarshalListOfMaps(usersRes.Items, &orgUserRecords)
+	if err != nil {
+		return domain.Organization{}, fmt.Errorf("failed to parse dynamodb response: %w", err)
+	}
+
+	return domain.Organization{
+		Id:   domain.OrgId(or.orgId),
+		Name: or.name,
+	}, nil
 }
 
 // GetOrgsForUser first retrieves the IDs of all organizations that the given user is a member of.  Then it calls GetOrg for each ID to retrieve further organization details.
@@ -39,7 +76,7 @@ func (c *Client) GetOrgsForUser(ctx context.Context, userId domain.UserId) ([]do
 
 	orgs := []domain.Organization{}
 	for _, orgUser := range orgUserRecords {
-		orgId := domain.OrgId(strings.Split(orgUser.OrgId, "#")[1])
+		orgId := domain.OrgId(strings.Split(orgUser.orgId, "#")[1])
 
 		org, err := c.GetOrg(ctx, orgId)
 		if err != nil {

@@ -1,23 +1,5 @@
 package dynamodb
 
-// func (o orgRepo) getOrgName(orgId string) (string, error) {
-// 	res, err := o.db.GetItem(context.Background(), &dynamodb.GetItemInput{
-// 		TableName: o.table,
-// 		Key: map[string]types.AttributeValue{
-// 			"pk": &types.AttributeValueMemberS{Value: fmt.Sprintf("ORG#%s", orgId)},
-// 			"sk": &types.AttributeValueMemberS{Value: "ORG"},
-// 		},
-// 	})
-// 	if err != nil {
-// 		return "", fmt.Errorf("failed to retrieve name for org %v: %w", orgId, err)
-// 	}
-
-// 	or := orgRecord{}
-// 	attributevalue.UnmarshalMap(res.Item, &or)
-
-// 	return or.Name, nil
-// }
-
 // func (o orgRepo) createOrg(name, adminId string) (string, error) {
 // 	id, err := newId()
 // 	if err != nil {
