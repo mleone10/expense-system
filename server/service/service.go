@@ -22,16 +22,34 @@ func (s *OrgService) GetOrgsForUser(ctx context.Context, userId domain.UserId) (
 }
 
 func (s *OrgService) CreateOrg(ctx context.Context, name string, adminId domain.UserId) (domain.Organization, error) {
+	if name == "" {
+		return domain.Organization{}, domain.ErrInvalidRequest
+	}
+
 	orgs, err := s.orgRepo.GetOrgsForUser(ctx, adminId)
 	if err != nil {
 		return domain.Organization{}, fmt.Errorf("failed to list existing orgs: %w", err)
 	}
 
 	if numOrgsAsAdmin(orgs, adminId) >= 3 {
-		return domain.Organization{}, domain.ErrMaxOrgs
+		return domain.Organization{}, domain.ErrInvalidRequest
 	}
 
-	return domain.Organization{}, nil
+	orgId, err := s.orgRepo.CreateOrg(ctx, name, adminId)
+	if err != nil {
+		return domain.Organization{}, fmt.Errorf("failed to create org: %w", err)
+	}
+
+	return domain.Organization{
+		Id:   orgId,
+		Name: name,
+		Members: []domain.Member{
+			{
+				Id:    adminId,
+				Admin: true,
+			},
+		},
+	}, nil
 }
 
 func numOrgsAsAdmin(orgs []domain.Organization, userId domain.UserId) int {

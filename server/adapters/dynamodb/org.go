@@ -100,3 +100,51 @@ func (c *Client) GetOrgsForUser(ctx context.Context, userId domain.UserId) ([]do
 
 	return orgs, nil
 }
+
+func (c *Client) CreateOrg(ctx context.Context, name string, adminId domain.UserId) (domain.OrgId, error) {
+	orgId, err := domain.NewOrgId()
+	if err != nil {
+		return "", fmt.Errorf("failed to generate new org id: %w", err)
+	}
+
+	orgItem, err := attributevalue.MarshalMap(orgRecord{
+		OrgId:   fmt.Sprintf("%s%s", prefixOrg, orgId),
+		OrgFlag: "ORG",
+		Name:    name,
+	})
+	if err != nil {
+		return "", fmt.Errorf("failed to marshal new org record to dynamodb item: %w", err)
+	}
+
+	orgAdminItem, err := attributevalue.MarshalMap(orgUserRecord{
+		OrgId:     fmt.Sprintf("%s%s", prefixOrg, orgId),
+		UserIdKey: fmt.Sprintf("%s%s", prefixUser, adminId),
+		Admin:     true,
+	})
+	if err != nil {
+		return "", fmt.Errorf("failed to marshal new org admin record to dynamodb item: %w", err)
+	}
+
+	_, err = c.db.TransactWriteItems(ctx, &dynamodb.TransactWriteItemsInput{
+		TransactItems: []types.TransactWriteItem{
+			{
+				Put: &types.Put{
+					TableName: c.table,
+					Item:      orgItem,
+				},
+			},
+			{
+				Put: &types.Put{
+					TableName: c.table,
+					Item:      orgAdminItem,
+				},
+			},
+		},
+	})
+	if err != nil {
+		return "", fmt.Errorf("failed to save new org and admin records to dynamodb: %w", err)
+	}
+
+	// TODO: Return JSON from http server when errors occur
+	return orgId, nil
+}

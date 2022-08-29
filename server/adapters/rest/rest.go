@@ -185,7 +185,7 @@ func (hs HttpServer) handleCreateNewOrg() http.HandlerFunc {
 		userId := getUserId(r)
 
 		org, err := hs.orgService.CreateOrg(r.Context(), req.Name, userId)
-		if err == domain.ErrMaxOrgs {
+		if err == domain.ErrInvalidRequest {
 			hs.writeClientError(w, r, fmt.Errorf("failed to create org: %w", err))
 			return
 		}

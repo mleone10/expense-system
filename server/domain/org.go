@@ -3,11 +3,21 @@ package domain
 import (
 	"context"
 	"errors"
+
+	"github.com/gofrs/uuid"
 )
 
-var ErrMaxOrgs = errors.New("user has reached the org limit")
+var ErrInvalidRequest = errors.New("request failed validation")
 
 type OrgId string
+
+func NewOrgId() (OrgId, error) {
+	id, err := uuid.NewV4()
+	if err != nil {
+		return "", err
+	}
+	return OrgId(id.String()), nil
+}
 
 type Organization struct {
 	Id      OrgId
@@ -37,4 +47,5 @@ type OrgService interface {
 type OrgRepo interface {
 	GetOrg(context.Context, OrgId) (Organization, error)
 	GetOrgsForUser(context.Context, UserId) ([]Organization, error)
+	CreateOrg(ctx context.Context, name string, adminId UserId) (OrgId, error)
 }
