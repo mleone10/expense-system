@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/mleone10/expense-system/domain"
 )
@@ -17,5 +18,8 @@ func NewAuthenticatedUserService(repo domain.AuthenticatedUserRepo) *Authenticat
 }
 
 func (s *AuthenticatedUserService) GetAuthenticatedUserInfo(ctx context.Context, authToken string) (domain.User, error) {
+	if authToken == "" {
+		return domain.User{}, fmt.Errorf("cannot retrieve user info with empty auth token")
+	}
 	return s.authenticatedUserRepo.GetAuthenticatedUserInfo(ctx, authToken)
 }

@@ -62,7 +62,6 @@ func getUserId(r *http.Request) domain.UserId {
 func (hs HttpServer) noOpAuthVerifier(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		reqWithUserId := r.WithContext(context.WithValue(r.Context(), keyUserId, testAdminUserId))
-		reqWithAuthToken := r.WithContext(context.WithValue(reqWithUserId.Context(), keyAuthToken, testAuthToken))
-		next.ServeHTTP(w, reqWithAuthToken)
+		next.ServeHTTP(w, reqWithUserId)
 	})
 }
