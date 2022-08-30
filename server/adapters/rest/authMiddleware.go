@@ -18,7 +18,10 @@ const (
 	keyUserId    keyTypeUserId    = "userId"
 )
 
-const testAdminUserId string = "nonProdTestAdmin"
+const (
+	testAdminUserId string = "nonProdTestAdmin"
+	testAuthToken   string = "nonProdTestToken"
+)
 
 func (hs HttpServer) authMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -58,7 +61,8 @@ func getUserId(r *http.Request) domain.UserId {
 
 func (hs HttpServer) noOpAuthVerifier(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		req := r.WithContext(context.WithValue(r.Context(), keyUserId, testAdminUserId))
-		next.ServeHTTP(w, req)
+		reqWithUserId := r.WithContext(context.WithValue(r.Context(), keyUserId, testAdminUserId))
+		reqWithAuthToken := r.WithContext(context.WithValue(reqWithUserId.Context(), keyAuthToken, testAuthToken))
+		next.ServeHTTP(w, reqWithAuthToken)
 	})
 }

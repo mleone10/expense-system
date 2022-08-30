@@ -11,8 +11,8 @@ import (
 	"github.com/mleone10/expense-system/domain"
 )
 
-// GetUserInfo uses the provided token to request user info from Cognito.
-func (a *CognitoClient) GetUserInfo(ctx context.Context, authToken string) (domain.User, error) {
+// GetAuthenticatedUserInfo uses the provided token to request user info from Cognito.
+func (a *CognitoClient) GetAuthenticatedUserInfo(ctx context.Context, authToken string) (domain.User, error) {
 	type userInfoResponse struct {
 		Name       string `json:"name"`
 		ProfileUrl string `json:"picture"`

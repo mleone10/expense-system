@@ -19,6 +19,5 @@ func NewLogger() *Logger {
 
 func (l Logger) Print(ctx context.Context, payload interface{}) {
 	payloadBytes, _ := json.Marshal(payload)
-	log.Println(string(payloadBytes))
 	l.logger.Printf("%v", string(payloadBytes))
 }

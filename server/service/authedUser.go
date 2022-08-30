@@ -6,12 +6,16 @@ import (
 	"github.com/mleone10/expense-system/domain"
 )
 
-type AuthenticatedUserService struct{}
+type AuthenticatedUserService struct {
+	authenticatedUserRepo domain.AuthenticatedUserRepo
+}
 
-func NewAuthedUserService() *AuthenticatedUserService {
-	return &AuthenticatedUserService{}
+func NewAuthedUserService(repo domain.AuthenticatedUserRepo) *AuthenticatedUserService {
+	return &AuthenticatedUserService{
+		authenticatedUserRepo: repo,
+	}
 }
 
 func (s *AuthenticatedUserService) GetAuthenticatedUserInfo(ctx context.Context, authToken string) (domain.User, error) {
-	return domain.User{}, nil
+	return s.authenticatedUserRepo.GetAuthenticatedUserInfo(ctx, authToken)
 }

@@ -23,7 +23,7 @@ func main() {
 
 	orgService := service.NewOrgService(orgRepo)
 
-	authedUserService := service.NewAuthedUserService()
+	authedUserService := service.NewAuthedUserService(authClient)
 
 	logger := stdlogger.NewLogger()
 
