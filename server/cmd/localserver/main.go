@@ -23,14 +23,14 @@ func main() {
 
 	orgService := service.NewOrgService(orgRepo)
 
-	authedUserService := service.NewAuthedUserService(authClient)
+	authenticatedUserService := service.NewAuthenticatedUserService(authClient)
 
 	logger := stdlogger.NewLogger()
 
 	server, _ := rest.NewServer(
 		rest.WithAuthClient(authClient),
 		rest.WithOrgService(orgService),
-		rest.WithAuthenticatedUserService(authedUserService),
+		rest.WithAuthenticatedUserService(authenticatedUserService),
 		rest.WithLogger(logger),
 		rest.WithSkipAuth(),
 	)

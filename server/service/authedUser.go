@@ -10,7 +10,7 @@ type AuthenticatedUserService struct {
 	authenticatedUserRepo domain.AuthenticatedUserRepo
 }
 
-func NewAuthedUserService(repo domain.AuthenticatedUserRepo) *AuthenticatedUserService {
+func NewAuthenticatedUserService(repo domain.AuthenticatedUserRepo) *AuthenticatedUserService {
 	return &AuthenticatedUserService{
 		authenticatedUserRepo: repo,
 	}

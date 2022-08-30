@@ -15,12 +15,12 @@ const (
 )
 
 type HttpServer struct {
-	router               chi.Router
-	authClient           domain.AuthClient
-	orgService           domain.OrgService
-	authedUserService    domain.AuthenticatedUserService
-	logger               domain.Logger
-	activeAuthMiddleware func(http.Handler) http.Handler
+	router                   chi.Router
+	authClient               domain.AuthClient
+	orgService               domain.OrgService
+	authenticatedUserService domain.AuthenticatedUserService
+	logger                   domain.Logger
+	activeAuthMiddleware     func(http.Handler) http.Handler
 }
 
 type OptionFunc func(*HttpServer)
@@ -77,9 +77,9 @@ func WithOrgService(orgService domain.OrgService) OptionFunc {
 	}
 }
 
-func WithAuthenticatedUserService(authedUserService domain.AuthenticatedUserService) OptionFunc {
+func WithAuthenticatedUserService(authenticatedUserService domain.AuthenticatedUserService) OptionFunc {
 	return func(hs *HttpServer) {
-		hs.authedUserService = authedUserService
+		hs.authenticatedUserService = authenticatedUserService
 	}
 }
 
@@ -214,7 +214,7 @@ func (hs HttpServer) handleGetUser() http.HandlerFunc {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		authToken := getAuthToken(r)
 
-		userInfo, err := hs.authedUserService.GetAuthenticatedUserInfo(r.Context(), authToken)
+		userInfo, err := hs.authenticatedUserService.GetAuthenticatedUserInfo(r.Context(), authToken)
 		if err != nil {
 			hs.writeError(w, r, fmt.Errorf("failed to get user info from identity provider: %w", err))
 			return
