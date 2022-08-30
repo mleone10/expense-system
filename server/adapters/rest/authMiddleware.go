@@ -8,9 +8,15 @@ import (
 	"github.com/mleone10/expense-system/domain"
 )
 
-type keyTypeUserId string
+type (
+	keyTypeAuthToken string
+	keyTypeUserId    string
+)
 
-const keyUserId keyTypeUserId = "userId"
+const (
+	keyAuthToken keyTypeAuthToken = "authToken"
+	keyUserId    keyTypeUserId    = "userId"
+)
 
 const testAdminUserId string = "nonProdTestAdmin"
 
@@ -28,9 +34,18 @@ func (hs HttpServer) authMiddleware(next http.Handler) http.Handler {
 			return
 		}
 
-		req := r.WithContext(context.WithValue(r.Context(), keyUserId, validatedToken.Subject()))
-		next.ServeHTTP(w, req)
+		reqWithUserId := r.WithContext(context.WithValue(r.Context(), keyUserId, validatedToken.Subject()))
+		reqWithAuthToken := r.WithContext(context.WithValue(reqWithUserId.Context(), keyAuthToken, tokenCookie.Value))
+		next.ServeHTTP(w, reqWithAuthToken)
 	})
+}
+
+func getAuthToken(r *http.Request) string {
+	authToken := r.Context().Value(keyAuthToken)
+	if authToken != nil {
+		return authToken.(string)
+	}
+	return ""
 }
 
 func getUserId(r *http.Request) domain.UserId {

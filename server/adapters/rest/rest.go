@@ -18,6 +18,7 @@ type HttpServer struct {
 	router               chi.Router
 	authClient           domain.AuthClient
 	orgService           domain.OrgService
+	authedUserService    domain.AuthenticatedUserService
 	logger               domain.Logger
 	activeAuthMiddleware func(http.Handler) http.Handler
 }
@@ -55,9 +56,9 @@ func NewServer(options ...OptionFunc) (*HttpServer, error) {
 				// })
 			})
 
-			// r.Route("/user", func(r chi.Router) {
-			// 	r.Get("/", s.handleGetUser())
-			// })
+			r.Route("/user", func(r chi.Router) {
+				r.Get("/", hs.handleGetUser())
+			})
 		})
 	})
 
@@ -73,6 +74,12 @@ func WithAuthClient(authClient domain.AuthClient) OptionFunc {
 func WithOrgService(orgService domain.OrgService) OptionFunc {
 	return func(hs *HttpServer) {
 		hs.orgService = orgService
+	}
+}
+
+func WithAuthenticatedUserService(authedUserService domain.AuthenticatedUserService) OptionFunc {
+	return func(hs *HttpServer) {
+		hs.authedUserService = authedUserService
 	}
 }
 
@@ -198,6 +205,25 @@ func (hs HttpServer) handleCreateNewOrg() http.HandlerFunc {
 	})
 }
 
+func (hs HttpServer) handleGetUser() http.HandlerFunc {
+	type response struct {
+		Name       string `json:"name"`
+		ProfileUrl string `json:"profileUrl"`
+	}
+
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		authToken := getAuthToken(r)
+
+		userInfo, err := hs.authedUserService.GetAuthenticatedUserInfo(r.Context(), authToken)
+		if err != nil {
+			hs.writeError(w, r, fmt.Errorf("failed to get user info from identity provider: %w", err))
+			return
+		}
+
+		writeResponse(w, response{Name: userInfo.Name, ProfileUrl: userInfo.ProfileUrl})
+	})
+}
+
 func readRequest(r *http.Request, dest interface{}) error {
 	return json.NewDecoder(r.Body).Decode(dest)
 }
@@ -212,6 +238,9 @@ func (hs HttpServer) writeError(w http.ResponseWriter, r *http.Request, err erro
 }
 
 func (hs HttpServer) writeClientError(w http.ResponseWriter, r *http.Request, err error) {
+	type errorPayload struct {
+		Error error `json:"error"`
+	}
 	http.Error(w, "invalid request", http.StatusBadRequest)
-	hs.logger.Print(r.Context(), err)
+	hs.logger.Print(r.Context(), errorPayload{Error: err})
 }
