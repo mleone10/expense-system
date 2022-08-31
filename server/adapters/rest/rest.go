@@ -2,16 +2,10 @@ package rest
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
-	"time"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/mleone10/expense-system/domain"
-)
-
-const (
-	cookieNameAuthToken string = "authToken"
 )
 
 type HttpServer struct {
@@ -46,19 +40,8 @@ func NewServer(options ...OptionFunc) (*HttpServer, error) {
 		r.Group(func(r chi.Router) {
 			r.Use(hs.activeAuthMiddleware)
 
-			r.Route("/orgs", func(r chi.Router) {
-				r.Get("/", hs.handleGetOrgs())
-				r.Post("/", hs.handleCreateNewOrg())
-				// r.Route(fmt.Sprintf("/{%s}", urlParamOrgId), func(r chi.Router) {
-				// 	r.Get("/", s.handleGetOrg())
-				// 	r.Post("/", s.handleUpdateOrg())
-				// 	r.Delete("/", s.handleDeleteOrg())
-				// })
-			})
-
-			r.Route("/user", func(r chi.Router) {
-				r.Get("/", hs.handleGetUser())
-			})
+			r.Route("/orgs", hs.orgsRouter())
+			r.Route("/user", hs.userRouter())
 		})
 	})
 
@@ -108,119 +91,6 @@ func (hs HttpServer) handleHealth() http.HandlerFunc {
 		writeResponse(w, response{
 			Status: "ok",
 		})
-	})
-}
-
-func (hs HttpServer) handleToken() http.HandlerFunc {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		ats, err := hs.authClient.GetAuthTokens(r.URL.Query().Get("code"))
-		if err != nil {
-			hs.writeError(w, r, fmt.Errorf("failed to get auth tokens: %w", err))
-			return
-		}
-
-		http.SetCookie(w, &http.Cookie{
-			Name:     cookieNameAuthToken,
-			Value:    ats.AccessToken,
-			HttpOnly: true,
-			Expires:  time.Now().Add(time.Hour * 168),
-		})
-		http.Redirect(w, r, hs.authClient.RedirectUrl(), http.StatusMovedPermanently)
-	})
-}
-
-func (hs HttpServer) handleSignOut() http.HandlerFunc {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		http.SetCookie(w, &http.Cookie{
-			Name:     cookieNameAuthToken,
-			Value:    "",
-			HttpOnly: true,
-			Expires:  time.Now().Add(time.Hour * -1),
-		})
-		w.WriteHeader(http.StatusOK)
-	})
-}
-
-func (hs HttpServer) handleGetOrgs() http.HandlerFunc {
-	type org struct {
-		Name  string `json:"name"`
-		Id    string `json:"id"`
-		Admin bool   `json:"admin"`
-	}
-
-	type response struct {
-		Orgs []org `json:"orgs"`
-	}
-
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		userId := getUserId(r)
-
-		orgs, err := hs.orgService.GetOrgsForUser(r.Context(), userId)
-		if err != nil {
-			hs.writeError(w, r, err)
-		}
-
-		res := response{Orgs: []org{}}
-		for _, o := range orgs {
-			res.Orgs = append(res.Orgs, org{
-				Name:  o.Name,
-				Id:    string(o.Id),
-				Admin: o.IsAdmin(userId),
-			})
-		}
-
-		writeResponse(w, res)
-	})
-}
-
-func (hs HttpServer) handleCreateNewOrg() http.HandlerFunc {
-	type request struct {
-		Name string `json:"name"`
-	}
-
-	type response struct {
-		Id string `json:"id"`
-	}
-
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		var req request
-		if err := readRequest(r, &req); err != nil {
-			hs.writeError(w, r, fmt.Errorf("failed to read org creation request: %w", err))
-			return
-		}
-
-		userId := getUserId(r)
-
-		org, err := hs.orgService.CreateOrg(r.Context(), req.Name, userId)
-		if err == domain.ErrInvalidRequest {
-			hs.writeClientError(w, r, fmt.Errorf("failed to create org: %w", err))
-			return
-		}
-		if err != nil {
-			hs.writeError(w, r, fmt.Errorf("failed to create org: %w", err))
-			return
-		}
-
-		writeResponse(w, response{Id: string(org.Id)})
-	})
-}
-
-func (hs HttpServer) handleGetUser() http.HandlerFunc {
-	type response struct {
-		Name       string `json:"name"`
-		ProfileUrl string `json:"profileUrl"`
-	}
-
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		authToken := getAuthToken(r)
-
-		userInfo, err := hs.authenticatedUserService.GetAuthenticatedUserInfo(r.Context(), authToken)
-		if err != nil {
-			hs.writeError(w, r, fmt.Errorf("failed to get user info from identity provider: %w", err))
-			return
-		}
-
-		writeResponse(w, response{Name: userInfo.Name, ProfileUrl: userInfo.ProfileUrl})
 	})
 }
 
