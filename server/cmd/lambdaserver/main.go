@@ -1,29 +1,24 @@
 package main
 
 import (
-	"log"
-	"os"
-
 	"github.com/aws/aws-lambda-go/events"
-	"github.com/aws/aws-lambda-go/lambda"
 	"github.com/awslabs/aws-lambda-go-api-proxy/httpadapter"
-	api "github.com/mleone10/expense-system"
 )
 
 func main() {
-	server, err := api.NewServer(api.Config{
-		CognitoClientId:     "6ka3m790cv5hrhjdqt2ju89v45",
-		CognitoClientSecret: os.Getenv("COGNITO_CLIENT_SECRET"),
-		ClientHostname:      "expense.mleone.dev",
-		ClientScheme:        "https",
-	})
-	if err != nil {
-		log.Fatalf("Failed to initialize server: %v", err)
-	}
+	// server, err := api.NewServer(api.Config{
+	// 	CognitoClientId:     "6ka3m790cv5hrhjdqt2ju89v45",
+	// 	CognitoClientSecret: os.Getenv("COGNITO_CLIENT_SECRET"),
+	// 	ClientHostname:      "expense.mleone.dev",
+	// 	ClientScheme:        "https",
+	// })
+	// if err != nil {
+	// 	log.Fatalf("Failed to initialize server: %v", err)
+	// }
 
-	adapter := httpadapter.New(server)
+	// adapter := httpadapter.New(server)
 
-	lambda.Start(serverHandler(adapter))
+	// lambda.Start(serverHandler(adapter))
 }
 
 func serverHandler(adapter *httpadapter.HandlerAdapter) func(req events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
