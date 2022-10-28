@@ -268,10 +268,13 @@ resource "aws_iam_role" "lambda_role" {
       Version = "2012-10-17"
       Statement = [
         {
-          Sid      = "AllowDynamoDBAccess"
-          Action   = "*"
-          Effect   = "Allow"
-          Resource = aws_dynamodb_table.records.arn
+          Sid    = "AllowDynamoDBAccess"
+          Action = "*"
+          Effect = "Allow"
+          Resource = [
+            aws_dynamodb_table.records.arn,
+            join("", [aws_dynamodb_table.records.arn, "/index/*"])
+          ]
         }
       ]
     })
