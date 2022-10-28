@@ -3,6 +3,7 @@ package rest
 import (
 	"encoding/json"
 	"net/http"
+	"time"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/mleone10/expense-system/domain"
@@ -103,8 +104,13 @@ func writeResponse(w http.ResponseWriter, src interface{}) error {
 }
 
 func (hs HttpServer) writeError(w http.ResponseWriter, r *http.Request, err error) {
+	type errorPayload struct {
+		RequestId string    `json:"requestId"`
+		Time      time.Time `json:"time"`
+		ErrorMsg  string    `json:"errorMsg"`
+	}
 	http.Error(w, "internal server error", http.StatusInternalServerError)
-	hs.logger.Print(r.Context(), err)
+	hs.logger.Print(r.Context(), errorPayload{getRequestId(r), time.Now(), err.Error()})
 }
 
 func (hs HttpServer) writeClientError(w http.ResponseWriter, r *http.Request, err error) {
