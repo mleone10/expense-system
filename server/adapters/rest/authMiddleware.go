@@ -23,7 +23,7 @@ const (
 	testAuthToken   string = "nonProdTestToken"
 )
 
-func (hs HttpServer) authMiddleware(next http.Handler) http.Handler {
+func (hs *HttpServer) authMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		tokenCookie, err := r.Cookie(cookieNameAuthToken)
 		if err != nil {
