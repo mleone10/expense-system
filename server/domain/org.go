@@ -39,6 +39,15 @@ func (o Organization) IsAdmin(id UserId) bool {
 	return false
 }
 
+func (o Organization) IsMember(id UserId) bool {
+	for _, m := range o.Members {
+		if m.Id == id {
+			return true
+		}
+	}
+	return false
+}
+
 type OrgService interface {
 	GetOrgsForUser(context.Context, UserId) ([]Organization, error)
 	CreateOrg(ctx context.Context, name string, adminId UserId) (Organization, error)
