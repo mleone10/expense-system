@@ -59,7 +59,7 @@ func (c *Client) GetOrg(ctx context.Context, orgId domain.OrgId) (domain.Organiz
 	}
 
 	return domain.Organization{
-		Id:      domain.OrgId(or.OrgId),
+		Id:      orgId,
 		Name:    or.Name,
 		Members: members,
 	}, nil
