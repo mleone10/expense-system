@@ -87,8 +87,17 @@ func (hs HttpServer) handleCreateNewOrg() http.HandlerFunc {
 }
 
 func (hs *HttpServer) handleGetOrg() http.HandlerFunc {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	type response struct {
+		Id           string   `json:"id"`
+		Name         string   `json:"name"`
+		CreationDate string   `json:"creationDate"`
+		Members      []string `json:"members"`
+	}
 
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		_ = getUserId(r)
+
+		writeResponse(w, response{Members: []string{}})
 	})
 }
 
