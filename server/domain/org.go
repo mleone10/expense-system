@@ -42,6 +42,7 @@ func (o Organization) IsAdmin(id UserId) bool {
 type OrgService interface {
 	GetOrgsForUser(context.Context, UserId) ([]Organization, error)
 	CreateOrg(ctx context.Context, name string, adminId UserId) (Organization, error)
+	GetOrg(ctx context.Context, userId UserId, orgId OrgId) (Organization, error)
 }
 
 type OrgRepo interface {

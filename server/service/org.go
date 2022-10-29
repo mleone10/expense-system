@@ -52,6 +52,14 @@ func (s *OrgService) CreateOrg(ctx context.Context, name string, adminId domain.
 	}, nil
 }
 
+func (s *OrgService) GetOrg(ctx context.Context, userId domain.UserId, orgId domain.OrgId) (domain.Organization, error) {
+	return domain.Organization{
+		Id:      orgId,
+		Name:    "",
+		Members: []domain.Member{{Id: userId, Admin: false}},
+	}, nil
+}
+
 func numOrgsAsAdmin(orgs []domain.Organization, userId domain.UserId) int {
 	adminCount := 0
 	for _, o := range orgs {
