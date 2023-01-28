@@ -52,6 +52,19 @@ func (s *OrgService) CreateOrg(ctx context.Context, name string, adminId domain.
 	}, nil
 }
 
+func (s *OrgService) GetOrg(ctx context.Context, userId domain.UserId, orgId domain.OrgId) (domain.Organization, error) {
+	org, err := s.orgRepo.GetOrg(ctx, orgId)
+	if err != nil {
+		return domain.Organization{}, fmt.Errorf("could not fetch org from repo: %w", err)
+	}
+
+	if !org.IsMember(userId) {
+		return domain.Organization{}, domain.ErrInvalidRequest
+	}
+
+	return org, nil
+}
+
 func numOrgsAsAdmin(orgs []domain.Organization, userId domain.UserId) int {
 	adminCount := 0
 	for _, o := range orgs {

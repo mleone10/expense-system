@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import "./Organizations.css"
 
 interface orgData {
@@ -26,6 +27,11 @@ interface OrgsTableProps {
 }
 
 const OrgsTable = (props: OrgsTableProps) => {
+  const navigate = useNavigate();
+  const handleRowClick = (id: string) => {
+    return navigate(`/orgs/${id}`)
+  }
+
   return (
     <table className="orgs-table">
       <thead>
@@ -35,9 +41,9 @@ const OrgsTable = (props: OrgsTableProps) => {
         </tr>
       </thead>
       <tbody>
-        {props.orgData.orgs.map((org) => {
+        {props.orgData.orgs.sort((a, b) => a.name > b.name ? 1 : -1).map((org) => {
           return (
-            <tr key={org.id}>
+            <tr key={org.id} onClick={() => handleRowClick(org.id)}>
               <td>{org.name}</td>
               <td>{org.admin ? "Admin" : "Member"}</td>
             </tr>
@@ -98,8 +104,8 @@ const CreateOrgForm = (props: CreateOrgFormProps) => {
       <form onSubmit={handleSubmit}>
         <label>
           Organization Name:
-          <input type="text" value={orgName} onChange={handleOrgNameChange} />
         </label>
+        <input type="text" value={orgName} onChange={handleOrgNameChange} />
         <input className="submit" type="submit" value="Create Org" />
       </form>
     </section>

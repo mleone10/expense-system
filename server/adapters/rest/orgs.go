@@ -87,8 +87,32 @@ func (hs HttpServer) handleCreateNewOrg() http.HandlerFunc {
 }
 
 func (hs *HttpServer) handleGetOrg() http.HandlerFunc {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	type member struct {
+		Name    string `json:"name"`
+		IsAdmin bool   `json:"isAdmin"`
+	}
 
+	type response struct {
+		Name         string   `json:"name"`
+		CreationDate string   `json:"creationDate"`
+		Members      []member `json:"members"`
+	}
+
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		userId := getUserId(r)
+		orgId := chi.URLParam(r, urlParamOrgId)
+
+		org, err := hs.orgService.GetOrg(r.Context(), userId, domain.OrgId(orgId))
+		if err != nil {
+			hs.writeError(w, r, fmt.Errorf("failed to get org: %w", err))
+		}
+
+		res := response{
+			Name:    org.Name,
+			Members: []member{},
+		}
+
+		writeResponse(w, res)
 	})
 }
 

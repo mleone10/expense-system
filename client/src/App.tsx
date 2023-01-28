@@ -1,7 +1,7 @@
 import { Routes, Route } from 'react-router';
 import { AuthProvider, ProtectedRoute } from 'hooks';
 import { ProfileBar, MainMenu, AppFooter } from "components";
-import { Home, Organizations, UnauthenticatedApp } from 'views';
+import { Home, Organization, Organizations, UnauthenticatedApp } from 'views';
 
 import './App.css';
 import { useState } from 'react';
@@ -28,6 +28,7 @@ function App() {
             <Route element={<ProtectedRoute />}>
               <Route path="/home" element={<Home />} />
               <Route path="/orgs" element={<Organizations />} />
+              <Route path="/orgs/:orgId" element={<Organization />} />
             </Route>
           </Routes>
         </main>
