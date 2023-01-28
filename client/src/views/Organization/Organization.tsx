@@ -6,7 +6,11 @@ interface orgData {
   name: string
   id: string
   creationDate: string
-  members: string[]
+  members: member[]
+}
+
+interface member {
+  name: string
 }
 
 const getOrg = async (orgId: string) => {
@@ -43,9 +47,38 @@ const Organization = () => {
 
   return (
     <React.Fragment>
-      <h1>Organization</h1>
-      <p>{orgData?.name}</p>
+      <OrgTitle orgData={orgData} />
+      <Members members={orgData?.members} />
     </React.Fragment>
+  )
+}
+
+interface orgTitleProps {
+  orgData: orgData | undefined
+}
+
+const OrgTitle = (props: orgTitleProps) => {
+  if (props.orgData !== undefined) {
+    return <h1>{props.orgData.name}</h1>
+  }
+  return <h1>Organization</h1>
+}
+
+interface membersProps {
+  members: member[] | undefined
+}
+
+const Members = (props: membersProps) => {
+  return (
+    <section>
+      <h2>Members</h2>
+      <ul>
+        {props?.members?.map((member) => {
+          return <li>{member.name}</li>
+        })
+        }
+      </ul>
+    </section>
   )
 }
 
